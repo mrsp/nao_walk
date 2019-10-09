@@ -1,0 +1,31 @@
+#include"nao_walk/joint_states_table.h"
+
+const std::vector<std::string>joint_state_names
+{
+    std::string("HeadYaw"),
+    std::string("HeadPitch"),
+    std::string("LShoulderPitch"),
+    std::string("LShoulderRoll"),
+    std::string("LElbowYaw"),
+    std::string("LElbowRoll"),
+    std::string("LWristYaw"), 
+    std::string("LHand"),
+    std::string("LHipYawPitch"),
+    std::string("LHipRoll"),
+    std::string("LHipPitch"),
+    std::string("LKneePitch"),
+    std::string("LAnklePitch"),
+    std::string("LAnkleRoll"),
+    std::string("RHipYawPitch"),
+    std::string("RHipRoll"),
+    std::string("RHipPitch"),
+    std::string("RKneePitch"),
+    std::string("RAnklePitch"),
+    std::string("RAnkleRoll"),
+    std::string("RShoulderPitch"),
+    std::string("RShoulderRoll"),
+    std::string("RElbowYaw"),
+    std::string("RElbowRoll"),
+    std::string("RWristYaw"),
+    std::string("RHand")
+};

@@ -1,0 +1,9 @@
+# Define the goal
+string text
+---
+# Define the result
+int32 status
+---
+# Define a feedback message
+float32 percent_complete 
+ 

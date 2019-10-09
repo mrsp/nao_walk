@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+ 	<include file="$(find nao_walk)/launch/nao_robot_state_publisher.launch" /> 
+	 <include file="$(find simple_stepplanner2D)/launch/foostep_planner.launch" />
+    <node pkg = "nao_walk" type = "nao_walk" name = "nao_walk" output = "screen">
+      <!--   <param name="nao_hostname" value="odysseus.local"/> -->
+      <!--  <param name="port" type="int" value="8080"/> -->
+		<!-- Load configurations from YAML file to parameter server -->
+	<rosparam file="$(find nao_walk)/config/robotcfg.yaml" command="load"/> 
+<!--         <param name="odom_topic" type="str" value="/SERoW/odom" />  -->
+    </node>	
+    <node pkg = "nao_walk" type = "nao_walk_dynamic_configure" name="nao_walk_dynamic_configure" output = "screen">
+    </node>
+    <node pkg = "nao_behaviour" type = "nao_behaviour_node" name="nao_behaviours" output = "screen">
+    </node>
+    
+</launch>

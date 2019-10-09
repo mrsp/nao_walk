@@ -1,0 +1,529 @@
+#include "PCThread.h"
+#include <iostream>
+
+
+PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), DynamicsY(rp), KalmanX(rp), KalmanY(rp)
+{
+
+
+
+    KalmanX.uBuffer.push(0.000);
+    KalmanY.uBuffer.push(0.000);
+    uX=0.000;
+    uY=0.000;
+    /** Defining the Optimal Gains for the Preview Controller **/
+    //Integral Feedback Gain
+
+   Gi= 3.602107812332011e+03;
+    //State Feedback Gain
+    Gx(0,0)=1.0e+05 *   1.197821056430750 ;
+    Gx(0,1)=1.0e+05 *  0.205146842637341;
+    Gx(0,2)=1.0e+05 *  0.002004473010844;
+    //Predicted Reference Gain
+   Gd(0) =-3602.1078;
+   Gd(1) =-6972.6987;
+   Gd(2) =-6573.9811;
+   Gd(3) =-6173.4103;
+   Gd(4) =-5802.0214;
+   Gd(5) =-5453.0391;
+   Gd(6) =-5125.0409;
+   Gd(7) =-4816.7715;
+   Gd(8) =-4527.0444;
+   Gd(9) =-4254.7444;
+   Gd(10) =-3998.823;
+   Gd(11) =-3758.2952;
+   Gd(12) =-3532.2351;
+   Gd(13) =-3319.7725;
+   Gd(14) =-3120.0894;
+   Gd(15) =-2932.4171;
+   Gd(16) =-2756.0333;
+   Gd(17) =-2590.2589;
+   Gd(18) =-2434.4557;
+   Gd(19) =-2288.0241;
+   Gd(20) =-2150.4003;
+   Gd(21) =-2021.0545;
+   Gd(22) =-1899.4888;
+   Gd(23) =-1785.2352;
+   Gd(24) =-1677.8539;
+   Gd(25) =-1576.9316;
+   Gd(26) =-1482.0798;
+   Gd(27) =-1392.9332;
+   Gd(28) =-1309.1488;
+   Gd(29) =-1230.4039;
+   Gd(30) =-1156.3956;
+   Gd(31) =-1086.8388;
+   Gd(32) =-1021.4658;
+   Gd(33) =-960.025;
+   Gd(34) =-902.2799;
+   Gd(35) =-848.0081;
+   Gd(36) =-797.0007;
+   Gd(37) =-749.0614;
+   Gd(38) =-704.0056;
+   Gd(39) =-661.6599;
+   Gd(40) =-621.8613;
+   Gd(41) =-584.4566;
+   Gd(42) =-549.3017;
+   Gd(43) =-516.2614;
+   Gd(44) =-485.2085;
+   Gd(45) =-456.0234;
+   Gd(46) =-428.5937;
+   Gd(47) =-402.814;
+   Gd(48) =-378.5849;
+   Gd(49) =-355.8131;
+   Gd(50) =-334.4111;
+   Gd(51) =-314.2964;
+   Gd(52) =-295.3916;
+   Gd(53) =-277.6239;
+   Gd(54) =-260.9249;
+   Gd(55) =-245.2304;
+   Gd(56) =-230.4798;
+   Gd(57) =-216.6166;
+   Gd(58) =-203.5871;
+   Gd(59) =-191.3415;
+   Gd(60) =-179.8323;
+   Gd(61) =-169.0155;
+   Gd(62) =-158.8493;
+   Gd(63) =-149.2945;
+   Gd(64) =-140.3145;
+   Gd(65) =-131.8747;
+   Gd(66) =-123.9424;
+   Gd(67) =-116.4874;
+   Gd(68) =-109.4807;
+   Gd(69) =-102.8955;
+   Gd(70) =-96.7063;
+   Gd(71) =-90.8895;
+   Gd(72) =-85.4225;
+   Gd(73) =-80.2844;
+   Gd(74) =-75.4553;
+   Gd(75) =-70.9167;
+   Gd(76) =-66.6511;
+   Gd(77) =-62.642;
+   Gd(78) =-58.8741;
+   Gd(79) =-55.3329;
+   Gd(80) =-52.0046;
+   Gd(81) =-48.8766;
+   Gd(82) =-45.9367;
+   Gd(83) =-43.1736;
+   Gd(84) =-40.5767;
+   Gd(85) =-38.136;
+   Gd(86) =-35.8422;
+   Gd(87) =-33.6863;
+   Gd(88) =-31.6601;
+   Gd(89) =-29.7557;
+   Gd(90) =-27.9659;
+   Gd(91) =-26.2838;
+   Gd(92) =-24.7028;
+   Gd(93) =-23.217;
+   Gd(94) =-21.8205;
+   Gd(95) =-20.508;
+   Gd(96) =-19.2744;
+   Gd(97) =-18.1151;
+   Gd(98) =-17.0255;
+   Gd(99) =-16.0014;
+   Gd(100) =-15.0389;
+   Gd(101) =-14.1343;
+   Gd(102) =-13.2841;
+   Gd(103) =-12.4851;
+   Gd(104) =-11.7341;
+   Gd(105) =-11.0283;
+   Gd(106) =-10.365;
+   Gd(107) =-9.7415;
+   Gd(108) =-9.1556;
+   Gd(109) =-8.6049;
+   Gd(110) =-8.0873;
+   Gd(111) =-7.6008;
+   Gd(112) =-7.1437;
+   Gd(113) =-6.714;
+   Gd(114) =-6.3101;
+   Gd(115) =-5.9306;
+   Gd(116) =-5.5739;
+   Gd(117) =-5.2386;
+   Gd(118) =-4.9235;
+   Gd(119) =-4.6273;
+   Gd(120) =-4.349;
+   Gd(121) =-4.0874;
+   Gd(122) =-3.8416;
+   Gd(123) =-3.6105;
+   Gd(124) =-3.3933;
+   Gd(125) =-3.1892;
+   Gd(126) =-2.9974;
+   Gd(127) =-2.8171;
+   Gd(128) =-2.6476;
+   Gd(129) =-2.4884;
+   Gd(130) =-2.3387;
+   Gd(131) =-2.198;
+   Gd(132) =-2.0658;
+   Gd(133) =-1.9416;
+   Gd(134) =-1.8248;
+   Gd(135) =-1.715;
+   Gd(136) =-1.6119;
+   Gd(137) =-1.5149;
+   Gd(138) =-1.4238;
+   Gd(139) =-1.3382;
+   Gd(140) =-1.2577;
+   Gd(141) =-1.182;
+   Gd(142) =-1.1109;
+   Gd(143) =-1.0441;
+   Gd(144) =-0.98129;
+   Gd(145) =-0.92227;
+   Gd(146) =-0.8668;
+   Gd(147) =-0.81466;
+   Gd(148) =-0.76566;
+   Gd(149) =-0.7196;
+
+
+
+
+
+
+
+    //Initializing Variables
+    Integrationfbx=0.000;
+    Statefbx=0.000;
+    Predictionfbx=0.000;
+    Integrationfby=0.000;
+    Statefby=0.000;
+    Predictionfby=0.000;
+
+
+
+    ZMPReferenceX.zero();
+    ZMPReferenceY.zero();
+    vrpx_d = 0;
+    vrpy_d = 0;
+    comx_d = 0;
+    comy_d = 0;
+    comdx_d = 0;
+    comdy_d = 0;
+    std::cout<<"Online Pattern Planner with Preview Controller Initialized Successfully"<<std::endl;
+    firstrun = true;
+    Observer_CoMX = 1.3;
+	Observer_CoMY = 1.3;
+	Observer_COPX = 4.0;
+	Observer_COPY = 4.0;
+}
+void PCThread::setInitialState( KVecFloat2 CoM, KVecFloat2 ZMP)
+{
+
+    DynamicsX.State(0) = CoM(0);
+    DynamicsY.State(0) = CoM(1);
+
+    DynamicsX.zmpstate= ZMP(0);
+    DynamicsY.zmpstate= ZMP(1);
+    DynamicsX.zmpstate_= ZMP(0);
+    DynamicsY.zmpstate_= ZMP(1);
+
+    vrpx_d = DynamicsX.zmpstate;
+    vrpy_d = DynamicsY.zmpstate;
+    comx_d = DynamicsX.State(0);
+    comy_d = DynamicsY.State(0);
+    comdx_d = DynamicsX.State(1);
+    comdy_d = DynamicsY.State(1);
+
+}
+
+
+
+
+
+
+
+
+void PCThread::Control(boost::circular_buffer<KVecFloat3> & ZmpBuffer, float CoMMeasuredX, float CoMMeasuredY, float CoMMeasuredZ, float ZMPMeasuredX, float ZMPMeasuredY)
+{
+
+
+
+
+/* Filter the ZMP Measurement for Delay Noise and Bias */
+    KalmanX.Filter(ZMPMeasuredX,CoMMeasuredX);
+    KalmanY.Filter(ZMPMeasuredY,CoMMeasuredY);
+    //Setting the Reference Signal
+
+    for (unsigned int i = 0; i < PreviewWindow; i++)
+    {
+        if (i < ZmpBuffer.size())
+        {
+            ZMPReferenceX(i) = ZmpBuffer[i](0);
+            ZMPReferenceY(i) = ZmpBuffer[i](1);
+        }
+        else
+        {
+            ZMPReferenceX(i) = ZmpBuffer[ZmpBuffer.size() - 1](0);
+            ZMPReferenceY(i) = ZmpBuffer[ZmpBuffer.size() - 1](1);
+        }
+    }
+
+
+    //State Feedback Computation
+    Statefbx=0.000;
+    Statefby=0.000;
+    Statefbx=Gx(0,0)*DynamicsX.State(0)+Gx(0,1)*DynamicsX.State(1)+Gx(0,2)*DynamicsX.State(2);
+    Statefby=Gx(0,0)*DynamicsY.State(0)+Gx(0,1)*DynamicsY.State(1)+Gx(0,2)*DynamicsY.State(2);
+
+
+    //Updating the Integral Feedback
+    Integrationfbx+=Gi*((DynamicsX.zmpstate)-ZMPReferenceX(0));
+    Integrationfby+=Gi*((DynamicsY.zmpstate)-ZMPReferenceY(0));
+
+
+    //Predicted Feedback Computation
+    Predictionfbx=0.000;
+    Predictionfby=0.000;
+
+
+
+    unsigned  int z=0;
+    for (unsigned  int i=0; i<PreviewWindow-1; i++)
+    {
+        Predictionfbx+=Gd(z)*ZMPReferenceX(i+1);
+        Predictionfby+=Gd(z)*ZMPReferenceY(i+1);
+        z++;
+    }
+
+
+
+
+    //Optimal Preview Control
+    uX=-Statefbx-Integrationfbx-Predictionfbx;
+    uY=-Statefby-Integrationfby-Predictionfby;
+    //Updating the Dynamics
+   // KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,ZMPMeasuredX);
+   // KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,ZMPMeasuredY);
+
+ //Updating the Dynamics
+
+
+    DynamicsX.Observer_CoM= Observer_CoMX;
+    DynamicsY.Observer_CoM= Observer_CoMY;
+    DynamicsX.Observer_COP= Observer_COPX;
+    DynamicsY.Observer_COP= Observer_COPY;
+    KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,KalmanX.StatePredict(0));
+    KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,KalmanY.StatePredict(0));
+
+
+
+    DynamicsX.Update(uX,errorX);
+    DynamicsY.Update(uY,errorY);
+
+
+
+    //Estimated COM position
+    vrpx_d = DynamicsX.zmpstate;
+    vrpy_d = DynamicsY.zmpstate;
+    comx_d = DynamicsX.State(0);
+    comy_d = DynamicsY.State(0);
+    comdx_d = DynamicsX.State(1);
+    comdy_d = DynamicsY.State(1);
+
+    KalmanX.uBuffer.push(DynamicsX.zmpstate-DynamicsX.zmpstate_);
+    KalmanY.uBuffer.push(DynamicsY.zmpstate-DynamicsY.zmpstate_);
+
+}
+
+
+
+Dynamics::Dynamics(RobotParameters &robot): OurRobot(robot)
+{
+/** Defining the System Dynamics Augmented with the Observer Structure **/
+
+Ad(0,0)=1.0000;
+Ad(0,1)=OurRobot.getWalkParameter(Ts);
+Ad(0,2)=OurRobot.getWalkParameter(Ts)*OurRobot.getWalkParameter(Ts)/2.0000;
+Ad(1,0)=0.0000;
+Ad(1,1)=1.0000;
+Ad(1,2)=Ad(0,1);
+Ad(2,0)=0.0000;
+Ad(2,1)=0.0000;
+Ad(2,2)=1.0000;
+/*----------------------*/
+Ad(0,3)=0.0000;
+Ad(1,3)=0.0000;
+Ad(2,3)=0.0000;
+Ad(3,0)=0.0000;
+Ad(3,1)=0.0000;
+Ad(3,2)=0.0000;
+Ad(3,3)=1.0000;
+
+
+Bd(0)=OurRobot.getWalkParameter(Ts)*OurRobot.getWalkParameter(Ts)*OurRobot.getWalkParameter(Ts)/6.0000;
+Bd(1)=OurRobot.getWalkParameter(Ts)*OurRobot.getWalkParameter(Ts)/2.0000;
+Bd(2)=OurRobot.getWalkParameter(Ts);
+Bd(3)=0.0000;
+
+Cd(0)=1.0000;
+Cd(1)=0.0000;
+Cd(2)=-(OurRobot.getWalkParameter(ComZ))/OurRobot.getWalkParameter(g);
+
+/** Defining the Optimal Gain for the Observer **/
+/** PREVIEW CONTROLLER OBSERVER **/
+
+/*
+L(0,0) =0.043131;
+L(0,1) =0.029367;
+L(1,0) =-0.23769;
+L(1,1) =-0.18224;
+L(2,0) =-3.9056;
+L(2,1) =-9.097;
+L(3,0) =-0.048234;
+L(3,1) =0.048326;
+*/
+L(0,0) =0.043131;
+L(0,1) =0.029367;
+L(1,0) =-0.23769;
+L(1,1) =-0.18224;
+L(2,0) =-25.9056;
+L(2,1) =-9.097;
+L(3,0) =-0.048234;
+L(3,1) =0.048326;
+
+
+
+State.zero();
+zmpstate=0.000;
+zmpstate_=0.000;
+
+temp.zero();
+
+
+Observer_CoM = 0.0;
+Observer_COP = 0.0;
+std::cout<<"Dynamics Initialized Successfully"<<std::endl;
+
+
+}
+
+
+void Dynamics::Update(float u,KVecFloat2 error)
+{
+/** Updating the Dynamics **/
+error-=KVecFloat2(State(0),(Cd(0)*State(0)+Cd(2)*State(2)+State(3)));
+error(0)*=Observer_CoM;
+error(1)*=Observer_COP;
+//std::cout<<"Observer_CoM: "<<Observer_CoM<<" Observer_COP: "<<Observer_COP<<std::endl;
+
+State=Ad*State;
+temp=Bd;
+temp.scalar_mult(u);
+State+=temp;
+State+=L*error;
+zmpstate_ = zmpstate;
+zmpstate=(Cd(0)*State(0)+Cd(2)*State(2));
+}
+
+
+
+Kalman::Kalman(RobotParameters &robot):OurRobot(robot)
+{
+    /*Akalman(0,0)=1.000;
+     Akalman(0,1)=0;//-OurRobot.getWalkParameter(Ts);
+     Akalman(1,0)=0.000;
+     Akalman(1,1)=1.000;*/
+    Bkalman.zero();
+    Bkalman(0)=1.000;//OurRobot.getWalkParameter(Ts);
+    StateKalman.zero();
+    ProcessNoise.zero();
+    ProcessNoise(0,0)=1*1e-5; //5*1e-7;
+    s.zero();
+    P.zero();
+    Kgain.zero();
+    P(0,0)=1e-10;
+    MeasurementNoise.identity();
+    
+    CoM_Noise = 0.01;
+    COP_Noise = 0.1;
+    MeasurementNoise(0,0) = CoM_Noise;
+    MeasurementNoise(1,1) = COP_Noise;
+    Ckalman.zero();
+    Ckalman(0,0)=1.000;
+    Ckalman(1,0)=1.000;
+    StatePredict.zero();
+    ykalman.zero();
+    
+    std::cout<<"ZMP Delayed Kalman Filter Initialized Successfully"<<std::endl;
+    
+    
+    
+}
+
+
+/** Kalman filter to  deal with Delay, and  Noise **/
+void Kalman::Filter(float ZMPMeasured,float CoMMeasured)
+{
+    
+    MeasurementNoise(0,0) = CoM_Noise;
+    MeasurementNoise(1,1) = COP_Noise;
+    
+    /** Predict **/
+    
+    StateKalman=StateKalman+Bkalman*uBuffer.front();
+    /** Estimated ZMP from the COM measurement
+     * using the Cart and Table Model
+     **/
+    float ct1=0.000,ct2=0.000;
+    float zmpfromcom=0.000;
+    
+    bool doup=false ;
+    if(fabs(ZMPMeasured)>1e-15)
+    {
+        P=P+ProcessNoise;
+        doup=true;
+        
+        if(combuffer.size()==2)
+        {
+            
+            
+            ct2=combuffer.front();
+            combuffer.pop();
+            ct1=combuffer.front();
+            combuffer.pop();
+            combuffer.push(ct1);
+            
+            
+            float comddot=(CoMMeasured-2*ct1+ct2)/(OurRobot.getWalkParameter(Ts)*OurRobot.getWalkParameter(Ts) );
+            zmpfromcom=CoMMeasured-(OurRobot.getWalkParameter(ComZ)/OurRobot.getWalkParameter(g))*comddot;
+        }
+        
+    }
+    
+    combuffer.push(CoMMeasured);
+    
+    /** Update **/
+    //StateKalman.prettyPrint();
+    if(doup)
+    {
+        /** innovation value **/
+        ykalman=KVecFloat2(ZMPMeasured,zmpfromcom);
+        ykalman+=(Ckalman*(StateKalman)).scalar_mult(-1.0);
+        
+        s=Ckalman*P*Ckalman.transp()+MeasurementNoise;
+        s.fast_invert();
+        Kgain=(P*Ckalman.transp())*s;
+        StateKalman+=Kgain*ykalman;
+        //StateKalman.prettyPrint();
+    }
+    
+    //StateKalman.prettyPrint();
+    
+    Kgain.scalar_mult(-1.0);
+    P+=Kgain*Ckalman*P;
+    if(combuffer.size()>2)
+        combuffer.pop();
+    
+    
+    if(uBuffer.size()>ZMPKALMANDELAY)
+        uBuffer.pop();
+    
+    
+    /** Getting Rid of the ZMP delay **/
+    StatePredict=StateKalman;
+    unsigned bufsize=uBuffer.size();
+    for(unsigned i=0; i<bufsize; i++)
+    {
+        StatePredict=StatePredict+Bkalman*uBuffer.front();
+        uBuffer.push(uBuffer.front());
+        uBuffer.pop();
+    }
+    
+    /** ------------------------------------------------------------- **/
+}

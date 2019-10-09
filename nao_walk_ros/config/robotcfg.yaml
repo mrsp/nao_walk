@@ -1,0 +1,9 @@
+RobotIP: "odysseus.local"
+#RobotIP: 169.254.113.113
+RobotPort: 9559
+DriverBrokerPort: 54000
+DriverBrokerIP: 0.0.0.0
+Version: V4
+BodyType: H2
+port: 8080
+nao_hostname: "odysseus.local"

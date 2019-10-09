@@ -1,0 +1,222 @@
+#include "StepAdjustment.h"
+StepAdjustment::StepAdjustment(RobotParameters &robot_):robot(robot_)
+{
+
+
+    //Variables are Lx Ly tau bx by
+    dt = (double) robot.getWalkParameter(Ts);
+    w = (double) robot.getWalkParameter(omega);
+    T_max = (double) robot.getWalkParameter(Tss_max);
+    T_min = (double) robot.getWalkParameter(Tss_min);
+    T_nom = (double) robot.getWalkParameter(Tss);
+    b_nom.zero();
+    L_nom.zero();
+    tau_min = exp(w*T_min);
+    tau_max = exp(w*T_max);
+    tau_nom = exp(w*T_nom);
+
+    rot.zero();
+    L_max.zero();
+    L_min.zero();
+    lp = (double) 2.0*robot.getWalkParameter(H0);
+ 
+    //Set weights
+    a_0 = 5.0;
+    a_1 = 5.0;
+    a_2 = 0.1;
+    a_3 = 1000000000.0;
+    a_4 = 1000000000.0;
+
+    n = 5;
+    G.resize(n, n);
+    G[0][0] = 2.0*a_0;
+    G[0][1] = 0.0;
+    G[0][2] = 0.0;
+    G[0][3] = 0.0;
+    G[0][4] = 0.0;
+
+
+    G[1][0] = 0.0;
+    G[1][1] = 2.0*a_1;
+    G[1][2] = 0.0;
+    G[1][3] = 0.0;
+    G[1][4] = 0.0;
+
+
+    G[2][0] = 0.0;
+    G[2][1] = 0.0;
+    G[2][2] = 2.0*a_2;
+    G[2][3] = 0.0;
+    G[2][4] = 0.0;
+
+    
+    G[3][0] = 0.0;
+    G[3][1] = 0.0;
+    G[3][2] = 0.0;
+    G[3][3] = 2.0*a_3;
+    G[3][4] = 0.0;
+
+
+    G[4][0] = 0.0;
+    G[4][1] = 0.0;
+    G[4][2] = 0.0;
+    G[4][3] = 0.0;
+    G[4][4] = 2.0*a_4;
+    
+ 
+    g0.resize(n);
+    g0[0] = 0.0;
+    g0[1] = 0.0;
+    g0[2] = -2.0*a_2*tau_nom;
+    g0[3] = 0.0;
+    g0[4] = 0.0;
+
+    m = 2;
+    ce0.resize(m);
+    ce0[0] = 0.0;
+    ce0[1] = 0.0;
+    CE.resize(n, m);
+    CE[0][0]= 1.0;
+    CE[1][0]= 0.0;
+    CE[2][0]= 0.0;
+    CE[3][0]= 1.0;
+    CE[4][0]= 0.0;
+
+    CE[0][1]= 0.0;
+    CE[1][1]= 1.0;
+    CE[2][1]= 0.0;
+    CE[3][1]= 0.0;
+    CE[4][1]= 1.0;
+
+    p = 6;
+    CI.resize(n, p);
+    CI[0][0] = -1.0;
+    CI[0][1] = 1.0;
+    CI[0][2] = 0.0;
+    CI[0][3] = 0.0;
+    CI[0][4] = 0.0;
+    CI[0][5] = 0.0;
+
+    CI[1][0] = 0.0;
+    CI[1][1] = 0.0;
+    CI[1][2] = -1.0;
+    CI[1][3] = 1.0;
+    CI[1][4] = 0.0;
+    CI[1][5] = 0.0;
+
+   
+    CI[2][0] = 0.0;
+    CI[2][1] = 0.0;
+    CI[2][2] = 0.0;
+    CI[2][3] = 0.0;
+    CI[2][4] = -1.0;
+    CI[2][5] = 1.0;
+
+    
+    CI[3][0] = 0.0;
+    CI[3][1] = 0.0;
+    CI[3][2] = 0.0;
+    CI[3][3] = 0.0;
+    CI[3][4] = 0.0;
+    CI[3][5] = 0.0;
+
+    CI[4][0] = 0.0;
+    CI[4][1] = 0.0;
+    CI[4][2] = 0.0;
+    CI[4][3] = 0.0;
+    CI[4][4] = 0.0;
+    CI[4][5] = 0.0;
+   
+    ci0.resize(p);
+    ci0[4]= tau_max;
+    ci0[5]= -tau_min;
+
+    x.resize(n);
+    cout<<"StepAdjustment in "<<axis<<" initialized successfully"<<endl;
+  
+}
+
+void StepAdjustment::solve(double Lx_nom, double Ly_nom, double diffx,  double diffy, double vrpx_0, double vrpy_0, double vrpx_ref, double vrpy_ref, double support_orientation, int RSS)
+{
+
+     rot.zero();
+     KMath::KMat::transformations::makeRotation(rot,support_orientation);
+
+ 
+        if(RSS==1)
+        {
+          Ly_max = (double) robot.getWalkParameter(MaxStepY);
+          Ly_min = (double) robot.getWalkParameter(MinStepY);
+          by_nom = -lp/(1+tau_nom)-(Ly_nom -lp)/(1.0-tau_nom);
+         
+        }
+        else
+        {
+          Ly_min = - (double) robot.getWalkParameter(MaxStepY);
+          Ly_max = - (double) robot.getWalkParameter(MinStepY);
+          by_nom = lp/(1+tau_nom)-(Ly_nom+lp)/(1.0-tau_nom);
+        }
+  
+        Lx_max = (double) robot.getWalkParameter(MaxStepX);
+        Lx_min = (double) robot.getWalkParameter(MinStepX);
+        bx_nom = Lx_nom/(tau_nom-1.0);
+
+  
+    g0[0] = -2.0*a_0*Lx_nom;
+    g0[1] = -2.0*a_1*Ly_nom;
+    g0[3] = -2.0*a_3*bx_nom;
+    g0[4] = -2.0*a_4*by_nom;
+
+
+    //Equality constraints
+    CE[2][0] = -diffx;
+    CE[2][1] = -diffy;
+
+    ce0[0] = 0.0;
+    ce0[1] = 0.0;
+
+
+
+
+
+
+    ci0[0] =  Lx_max;
+    ci0[1] = -Lx_min;
+    ci0[2] =  Ly_max;
+    ci0[3] = -Ly_min;
+
+
+    double f = solve_quadprog(G, g0, CE, ce0, CI, ci0, x);
+    //std::cout << "f: " << f << std::endl;
+    if(f>std::numeric_limits<double>::max()) //e.g. problem is infeasible, follow the nomimal gait pattern
+    {
+        step_locationx = vrpx_ref;
+        step_locationy = vrpy_ref;
+        step_duration = T_nom;
+        step_instructions = ceil(step_duration/dt);
+        step_bx = 0.0;
+        step_by = 0.0;
+    }
+    else
+    {
+     
+      tempV(0) = x[0];
+      tempV(1) = x[1];
+      tempV = rot*tempV;
+
+      step_locationx = tempV(0) + vrpx_0;
+      step_locationy = tempV(1) + vrpy_0;
+      step_duration = 1.0/w * log(x[2]);
+      step_instructions = ceil(step_duration/dt);
+      step_bx = x[3];
+      step_by = x[4];
+    }
+      cout<<"Ref Location"<<endl;
+      cout<<Lx_nom<<" "<<Ly_nom<<endl;
+      cout<<"Opt Location"<<endl;
+      cout<<x[0]<<" "<<x[1]<<endl;
+      cout<<"Step Instructions"<<endl;
+      cout<<step_instructions<<endl;
+      cout<<"Step bx "<<step_bx<<"Step bx nom "<<bx_nom<<endl;
+      cout<<"Step by "<<step_by<<"Step by nom "<<by_nom<<endl;
+}

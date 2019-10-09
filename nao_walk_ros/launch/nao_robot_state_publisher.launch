@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+        <param name="robot_description" command="cat $(find nao_walk)/share/urdf/nao.urdf" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+		<param name="publish_frequency" type="double" value="100.0"/>
+	</node>
+</launch>

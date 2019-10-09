@@ -1,0 +1,20 @@
+# CROUCH    = 0
+# WAKE_UP   = 1
+# MAKARENA  = 2
+# BALL,
+# DANCE_EVOL,
+# GANGNAM_ST,
+# VANGELIS,
+# TIRED,
+# HELLO,
+# TAICHI,
+# EYE_OF_TIGER,
+
+# Define the goal
+int32 behaviour_id
+---
+# Define the result
+int32 status
+---
+# Define a feedback message
+float32 percent_complete 
