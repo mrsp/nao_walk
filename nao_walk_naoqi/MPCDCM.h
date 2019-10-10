@@ -6,7 +6,7 @@
 #include "KMat.hpp"
 #include <iostream>
 #include "DelayedObserverDCM.h"
-#define Np 102
+#define Np 122
 using namespace Eigen;
 using namespace std;
 class MPCDCM

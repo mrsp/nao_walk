@@ -3,7 +3,7 @@
 #define DEF_STEP_ID -1
 
 WalkEngine::WalkEngine(RobotParameters &rp) : NaoLIPM(rp),NaoRobot(rp),stepAnkleQ(rp.getWalkParameter(StepPlanSize)), velocityQ(rp.getWalkParameter(StepPlanSize)),tp(rp), sp(rp), 
-NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp), CoM_ac(rp),  copKF(rp) // flog("log",RAW,20)
+NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) // flog("log",RAW,20)
 {
     
     FSRDataInit = false;
@@ -611,23 +611,12 @@ void WalkEngine::stateEstimationLoop()
         Gyro  = Vector3f(GyroX_LPF->filter(Gyro(0)),GyroY_LPF->filter(Gyro(1)),Gyro(2));
 
 
-        if (copKF.firstrun)
-        {
-            copKF.setInitialState(Vector4d(copi(0),0,copi(1),0));
-        }
-
-        if(isEstimationLoopInitialized)
-            copKF.predict(Vector2d(tp.ZMPbuffer[0](0),tp.ZMPbuffer[0](1)));
-        else
-            copKF.predict(Vector2d(0.0,0.0));
-
+       
 
         AccW = Tib_eig.linear()*Acc;
         GyroW = Tib_eig.linear()*Gyro;
         computeGyrodot();
-        copKF.updateWithCoM(Vector3d(CoMm(0),CoMm(1),CoMm(2)),Vector3d(AccW(0),AccW(1),AccW(2)), Vector3d(GyroW(0),GyroW(1),GyroW(2)));
-        copKF.updateWithCOP(Vector2d(copi(0),copi(1)));
-    
+       
 
         if (nipmEKF->firstrun){
             nipmEKF->setCoMPos(CoMm);
@@ -658,20 +647,18 @@ void WalkEngine::Calculate_Desired_COM()
     
 
 
-    
 
         if(NaoMPCDCM.firstrun)
         {	
-            NaoMPCDCM.setInitialState(Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)),Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+            NaoMPCDCM.setInitialState(Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
             NaoMPCDCM.firstrun = false;
-
-
          }
-         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)),Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+
+
         CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
         Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
 
-    
 	
     /*
         if(NaoLIPM.firstrun)
@@ -687,7 +674,6 @@ void WalkEngine::Calculate_Desired_COM()
     CoM_c = NaoVRPToCoM.Control(Vector2d(NaoLIPM.comx_d,NaoLIPM.comy_d),Vector2d(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d), Vector2d(copi(0),copi(1)), Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
     */
 
-    //NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copKF.zmpx,copKF.zmpy);
     /*
         flog.insert("stepL_ax",tp.stepl_a(0));
         flog.insert("stepL_ay",tp.stepl_a(1));
@@ -969,10 +955,7 @@ std::vector<float> WalkEngine::Calculate_IK()
     desired=KVecDouble3(CoM_c(0),CoM_c(1),CoM_c(2)).scalar_mult(1000);
 
     
-     //if(startup==NaoRobot.getWalkParameter(Init_instructions) && double_support_id)
-     //desired(2) -= (CoM_ac.Control(forceR(2)+forceL(2)))*1000.0;
-     //else if(!CoM_ac.resetted)
-     //CoM_ac.reset();
+
      
     /** Targets for leg feet Transformations **/
     Til=getTransformation(NaoFeetEngine.getFootXYTheta(LeftFoot), NaoFeetEngine.getFootZ(LeftFoot));

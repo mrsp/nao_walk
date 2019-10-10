@@ -105,10 +105,10 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
 
     R.resize(Np,Np);
     R.setIdentity();
-    R*=1.0e-4;
+    R*=5.0e-3;
 
     qx = 0.1;
-    qv = 0.01;
+    qv = 1.0;
 
    
     Qv.resize(Np,Np);
@@ -245,8 +245,8 @@ void MPCDCM::Control(boost::circular_buffer<KVecFloat3> & VRPRef, Vector2f DCM, 
 	y_ = y;  
     
     
-	dObsDCMx.update(u_x,VRP(0),CoM(0));
-    dObsDCMy.update(u_y,VRP(1),CoM(1));
+	dObsDCMx.update(u_x,VRP(0),DCM(0),CoM(0));
+    dObsDCMy.update(u_y,VRP(1),DCM(1),CoM(1));
     x =  dObsDCMx.getState();
     y =  dObsDCMy.getState();
     

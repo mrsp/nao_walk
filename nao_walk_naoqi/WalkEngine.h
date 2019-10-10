@@ -17,11 +17,9 @@
 //#include "JointSSKF.h"
 #include "FeetEngine.h"
 #include "MotionDefines.h"
-#include "CoM_Admittance.h"
 #include "butterworthLPF.h"
 #include "butterworthHPF.h"
 #include "TrajectoryPlanner.h"
-#include "COPKF.h"
 #include <eigen3/Eigen/Dense>
 #include "ZMPDistributor.h"
 #include "Stepplanner2D.h"
@@ -74,7 +72,6 @@ public:
     
     butterworthLPF* leftGRF_LPF;
     butterworthLPF* rightGRF_LPF;
-    COPKF copKF;
     Vector3f copi,copi_cropped;
     
     
@@ -85,7 +82,6 @@ public:
     /** Posture Controller **/
     PostureController NaoPosture;
     
-    CoM_Admittance CoM_ac;
     Vector3f forceL, forceR, forceLw, forceRw;
     
     Stepplanner2D sp;

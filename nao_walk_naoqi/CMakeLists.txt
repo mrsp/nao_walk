@@ -43,16 +43,12 @@ FeetEngine.h
 FeetEngine.cpp
 matlog.h
 matlog.cpp
-CoM_Admittance.h
-CoM_Admittance.cpp
 butterworthLPF.h
 butterworthLPF.cpp
 butterworthHPF.h
 butterworthHPF.cpp
 TrajectoryPlanner.h
 TrajectoryPlanner.cpp
-COPKF.h
-COPKF.cpp
 SocketServer.cpp
 DelayedObserverDCM.h
 DelayedObserverDCM.cpp

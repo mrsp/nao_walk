@@ -13,11 +13,12 @@ DelayedObserverDCM::DelayedObserverDCM(RobotParameters &robot):NaoRobot(robot)
     
     Ccom.setZero();
     Czmp.setZero();
+    Cdcm.setZero();
 
     Ccom(0,0) = 1.000;
 	Czmp(0,2) = 1.000;
 	Czmp(0,3) = 1.000;
-    
+    Cdcm(0,1) = 1,000;
 
 
 
@@ -33,23 +34,24 @@ DelayedObserverDCM::DelayedObserverDCM(RobotParameters &robot):NaoRobot(robot)
     B *= NaoRobot.getWalkParameter(Ts);
 
 
-   L.setZero();
-L(0,0) =0.16942;
-L(0,1) =-0.0027512;
-L(1,0) =0.36788;
-L(1,1) =-0.045975;
-L(2,0) =-0.024534;
-L(2,1) =0.31559;
-L(3,0) =0.024521;
-L(3,1) =0.12636;
-
+    L.setZero();
+    L(0,0) =0.13037;
+    L(0,1) =0.0057711;
+    L(0,2) =-1.0574e-05;
+    L(1,0) =0.28495;
+    L(1,1) =0.013253;
+    L(1,2) =-5.6422e-05;
+    L(2,0) =-0.026206;
+    L(2,1) =-0.0019112;
+    L(2,2) =9.1415e-05;
+    L(3,0) =0.025393;
+    L(3,1) =0.0018155;
+    L(3,2) =0.095079;
     L=L*0;
-    
-   Lcom.setZero();
-   Lcom  = L.block<4,1>(0,0);
 
-
-    cout<<"ZMP Delayed Observer Initialized Successfully"<<endl;
+    Lcom.setZero();
+    Lcom  = L.block<4,2>(0,0);
+    cout<<"DCM Delayed Observer Initialized Successfully"<<endl;
     firstrun = true;
 
 }
@@ -62,30 +64,27 @@ void DelayedObserverDCM::setInitialState(Vector4f x_)
 }
 
 
-void DelayedObserverDCM::update(float u_, float zmp_, float com_)
-{
-    
+void DelayedObserverDCM::update(float u_, float zmp_, float dcm_, float com_)
+{  
     if(xbuffer.size() > (int) ZMPDELAY - 1)
     {
         com_ -= Ccom*x;
         zmp_ -= Czmp*xbuffer.front();
+        dcm_ -= Cdcm*x;
         x = A*x;
         x.noalias() +=  B*u_;
-        x.noalias() +=  L * Vector2f(com_,zmp_);
+        x.noalias() +=  L * Vector3f(com_,dcm_,zmp_);
         xbuffer.pop();        
     }
     else
     {
         com_ -= Ccom*x;
+        dcm_ -= Cdcm*x;
         x = A*x;
         x.noalias() +=  B*u_;
-        x.noalias() +=  Lcom * com_;
+        x.noalias() +=  Lcom * Vector2f(com_,dcm_);
     }
-
-
-
     xbuffer.push(x);
-
     updateVars();
 }
 
