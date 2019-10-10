@@ -21,7 +21,7 @@
   nao_walk/nao_walk_naoqi/build-cross-naoqi-sdk/sdk/lib/naoqi
 * scp libnao_walkF.so nao@nao.local:/home/nao/modules to copy the module onto NAO.
 
-## nao walk ROS wrapeper
+## nao walk ROS wrapper
 * catkin_make 
 * roslaunch nao_walk gait_control.launch
 * roslaunch teleop_twist_keyboard velocity_cmd.launch (To make the robot walk with the keyboard)
