@@ -5,7 +5,6 @@
 #include <boost/circular_buffer.hpp>
 #include "KMat.hpp"
 #include <iostream>
-//#include "DelayedKalmanDCM.h"
 #include "DelayedObserverDCM.h"
 #define Np 102
 using namespace Eigen;
@@ -19,7 +18,6 @@ class MPCDCM
 
 
         DelayedObserverDCM dObsDCMx, dObsDCMy;
-        //DelayedKalmanDCM dObsDCMx, dObsDCMy;
 
         float    du_x, du_y, qx, qv, u_x, u_y;
         Vector2f DCM_, VRP_;

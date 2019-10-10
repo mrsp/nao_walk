@@ -54,8 +54,6 @@ TrajectoryPlanner.cpp
 COPKF.h
 COPKF.cpp
 SocketServer.cpp
-DelayedKalmanDCM.h
-DelayedKalmanDCM.cpp
 DelayedObserverDCM.h
 DelayedObserverDCM.cpp
 ZMPDistributor.h

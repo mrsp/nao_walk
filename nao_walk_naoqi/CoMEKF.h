@@ -69,7 +69,7 @@ public:
 
 	float comd_q, com_q, fd_q, com_r, comdd_r;
 
-	float dt, m, g, I_xx,I_yy;
+	float dt, m, g, I_xx,I_yy, l;
 
     float bias_fx, bias_fy, bias_fz;
 	bool firstrun;
@@ -85,13 +85,13 @@ public:
 		DCMy_LPF->init("DCMy",1.0/dt,4.0);
 	}
 
-	void setParams(float m_, float I_xx_, float I_yy_, float g_)
+	void setParams(float m_, float I_xx_, float I_yy_, float g_, float l_)
 	{
 		m = m_;
 		I_xx = I_xx_;
 		I_yy = I_yy_;
 		g = g_;
-
+		l = l_;
 	}
 
 	void setCoMPos(Vector3f pos) {

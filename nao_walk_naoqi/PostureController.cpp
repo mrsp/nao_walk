@@ -28,14 +28,21 @@ void PostureController::default_params()
     
     dt = NaoRobot.getWalkParameter(Ts);
     
-    Tc_ = NaoRobot.getWalkParameter(Tc);
-    Kc_ = NaoRobot.getWalkParameter(Kc);
+    Tcx_ = NaoRobot.getWalkParameter(Tcx);
+    Kcx_ = NaoRobot.getWalkParameter(Kcx);
+    Tcy_ = NaoRobot.getWalkParameter(Tcy);
+    Kcy_ = NaoRobot.getWalkParameter(Kcy);
+
+
 
     Ta_ = NaoRobot.getWalkParameter(Ta);
     Ka_ = NaoRobot.getWalkParameter(Ka);
 
     Tn_ = NaoRobot.getWalkParameter(Tn);
     Kn_ = NaoRobot.getWalkParameter(Kn);
+
+    
+
 }
 
 
@@ -60,13 +67,6 @@ void PostureController::ankleStabilizer(Vector3f tauld, Vector3f taurd, Vector3f
      float lankle_Pitch_d, float rankle_Pitch_d,float lankle_Roll_d,float rankle_Roll_d)
 {
     
-    
-    Ta_ = NaoRobot.getWalkParameter(Ta);
-    Ka_ = NaoRobot.getWalkParameter(Ka);
-    dt = NaoRobot.getWalkParameter(Ts);
-
-
-
 
 
     dLAnkle_Roll = Ka_ * dt * (tauld(0) - taul(0)) + (1.0 - dt/Ta_) * dLAnkle_Roll;
@@ -123,13 +123,10 @@ void PostureController::kneeStabilizer(float flz, float frz,  float  flz_d, floa
 
 void PostureController::torsoStabilizer(float Torso_Roll, float Torso_Pitch, float Torso_Roll_d, float Torso_Pitch_d, float lhip_Pitch_d, float rhip_Pitch_d,float lhip_Roll_d,float rhip_Roll_d)
 {
-    
-    Tc_ = NaoRobot.getWalkParameter(Tc);
-    Kc_ = NaoRobot.getWalkParameter(Kc);
-  
-    dt = NaoRobot.getWalkParameter(Ts);
-    dTorso_Roll = Kc_ * dt * (Torso_Roll_d - Torso_Roll) + (1.0 - dt/Tc_) * dTorso_Roll;
-    dTorso_Pitch = Kc_ * dt * (Torso_Pitch_d - Torso_Pitch) + (1.0 - dt/Tc_) * dTorso_Pitch;
+ 
+
+    dTorso_Roll = Kcx_ * dt * (Torso_Roll_d - Torso_Roll) + (1.0 - dt/Tcx_) * dTorso_Roll;
+    dTorso_Pitch = Kcy_ * dt * (Torso_Pitch_d - Torso_Pitch) + (1.0 - dt/Tcy_) * dTorso_Pitch;
 
 
     lhip_Roll = lhip_Roll_d  - dTorso_Roll;

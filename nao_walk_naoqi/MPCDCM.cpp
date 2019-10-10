@@ -107,8 +107,8 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
     R.setIdentity();
     R*=1.0e-4;
 
-    qx = 0.05;
-    qv = 0.02;
+    qx = 0.1;
+    qv = 0.01;
 
    
     Qv.resize(Np,Np);
@@ -251,15 +251,6 @@ void MPCDCM::Control(boost::circular_buffer<KVecFloat3> & VRPRef, Vector2f DCM, 
     y =  dObsDCMy.getState();
     
 
-    //If Kalman Observer with delay
-    // dObsDCMx.predict(u_x);
-    // dObsDCMy.predict(u_y);
-	// //dObsDCMx.updateWithCOP(VRP(0));
-    // //dObsDCMy.updateWithCOP(VRP(1));
-    // dObsDCMx.updateWithCoM(CoM(0));
-    // dObsDCMy.updateWithCoM(CoM(1));
-    // x =  dObsDCMx.getState();
-    // y =  dObsDCMy.getState();
 	//Desired Gait Pattern Reference
 	comx_d = x(0);
 	comy_d = y(0);

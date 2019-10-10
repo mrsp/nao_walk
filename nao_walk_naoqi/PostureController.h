@@ -17,7 +17,7 @@ private:
     void default_params();
 public:
     /** Ankle PD Control **/
-    float Kc_, Tc_, Ka_, Ta_, Kn_, Tn_, dt;
+    float Kcx_, Kcy_, Tcx_, Tcy_, Ka_, Ta_, Kn_, Tn_, dt;
     float dTorso_Roll, dTorso_Pitch, dLAnkle_Roll, dLAnkle_Pitch, dRAnkle_Roll, dRAnkle_Pitch, dKnee_Pitch;
     /** AM Control **/
     float amX, amY;

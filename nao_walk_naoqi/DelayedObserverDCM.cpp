@@ -34,16 +34,16 @@ DelayedObserverDCM::DelayedObserverDCM(RobotParameters &robot):NaoRobot(robot)
 
 
    L.setZero();
-    L(0,0) =0.13494;
-    L(0,1) =0.003825;
-    L(1,0) =0.003129;
-    L(1,1) =0.038694;
-    L(2,0) =0.033215;
-    L(2,1) =0.34279;
-    L(3,0) =-0.052321;
-    L(3,1) =0.26414;
+L(0,0) =0.16942;
+L(0,1) =-0.0027512;
+L(1,0) =0.36788;
+L(1,1) =-0.045975;
+L(2,0) =-0.024534;
+L(2,1) =0.31559;
+L(3,0) =0.024521;
+L(3,1) =0.12636;
 
-    L=L/20.0;
+    L=L*0;
     
    Lcom.setZero();
    Lcom  = L.block<4,1>(0,0);
@@ -71,7 +71,7 @@ void DelayedObserverDCM::update(float u_, float zmp_, float com_)
         zmp_ -= Czmp*xbuffer.front();
         x = A*x;
         x.noalias() +=  B*u_;
-       // x.noalias() +=  L * Vector2f(com_,zmp_);
+        x.noalias() +=  L * Vector2f(com_,zmp_);
         xbuffer.pop();        
     }
     else
@@ -79,7 +79,7 @@ void DelayedObserverDCM::update(float u_, float zmp_, float com_)
         com_ -= Ccom*x;
         x = A*x;
         x.noalias() +=  B*u_;
-       // x.noalias() +=  Lcom * com_;
+        x.noalias() +=  Lcom * com_;
     }
 
 

@@ -5,10 +5,10 @@ CoMAdmittanceControl::CoMAdmittanceControl(RobotParameters &robot):NaoRobot(robo
 
 	K_pitch = 0.0;
 	K_roll =  0.0;
-    gain_x =  1.25;
-    gain_y =  2.25;
-	//gain_x =  2.25;
-    //gain_y =  4.25;
+    // gain_x =  1.25;
+    // gain_y =  2.25;
+	gain_x =  3.0;
+    gain_y =  1.0;
     com_c.setZero();
 
     k_f(0,0) = gain_x;
@@ -18,8 +18,8 @@ CoMAdmittanceControl::CoMAdmittanceControl(RobotParameters &robot):NaoRobot(robo
 	zmp_delay = 5;
     firstrun = true;
 
-    rateX = 7.5;
-    rateY = 7.5;
+    rateX = 6.5;
+    rateY = 6.5;
     ZMPXint.rate(rateX);
 	ZMPXint.setZero();
     ZMPPXint.rate(rateX);
