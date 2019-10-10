@@ -9,3 +9,15 @@
 * Ubuntu 16.04 and later
 * ROS kinetic and later
 * Eigen 3.2.0 and later
+
+## Instalation
+* git clone https://github.com/mrsp/nao_walk.git
+* cd nao_walk/nao_walk_naoqi && qibuild init
+* qibuild configure --release -c cross-naoqi-sdk
+* qibuild make -c cross-naoqi-sdk
+* This will generate a naoqi module named libnao_walkF.so  in nao_walk/nao_walk_naoqi/build-cross-naoqi-sdk/sdk/lib/naoqi you need to copy this on nao
+* scp libnao_walkF.so nao@nao.local:/home/nao/modules
+
+* catkin_make 
+* roslaunch nao_walk gait_control.launch
+* roslaunch teleop_twist_keyboard velocity_cmd.launch (To make the robot walk with the keyboard)
