@@ -11,13 +11,17 @@
 * Eigen 3.2.0 and later
 
 ## Instalation
-* git clone https://github.com/mrsp/nao_walk.git
+* git clone https://github.com/mrsp/nao_walk.git in a ROS workspace.
+
+## naoqi walk module
 * cd nao_walk/nao_walk_naoqi && qibuild init
 * qibuild configure --release -c cross-naoqi-sdk
 * qibuild make -c cross-naoqi-sdk
-* This will generate a naoqi module named libnao_walkF.so  in nao_walk/nao_walk_naoqi/build-cross-naoqi-sdk/sdk/lib/naoqi you need to copy this on nao
-* scp libnao_walkF.so nao@nao.local:/home/nao/modules
+* This will generate a naoqi module named "libnao_walkF.so"  in:
+  nao_walk/nao_walk_naoqi/build-cross-naoqi-sdk/sdk/lib/naoqi
+* scp libnao_walkF.so nao@nao.local:/home/nao/modules to copy the module onto NAO.
 
+## nao walk ROS wrapeper
 * catkin_make 
 * roslaunch nao_walk gait_control.launch
 * roslaunch teleop_twist_keyboard velocity_cmd.launch (To make the robot walk with the keyboard)
