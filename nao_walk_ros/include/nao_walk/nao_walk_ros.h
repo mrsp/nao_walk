@@ -13,15 +13,12 @@
 #include <eigen3/Eigen/Dense>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/server/simple_action_server.h>
-#include <simple_stepplanner2D/RequestStepAction.h>
 #include <humanoid_nav_msgs/ExecFootstepsAction.h>
 #include <humanoid_nav_msgs/StepTarget.h>
 #include <humanoid_nav_msgs/ExecFootstepsGoal.h>
 #include <humanoid_nav_msgs/ExecFootstepsFeedback.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/JointState.h>
-#include <simple_stepplanner2D/Step.h>
-#include <simple_stepplanner2D/InitStep.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 
@@ -94,7 +91,6 @@ class nao_walk_ros
 {
     
     private:
-        bool simpleStepAvailable;
         //actions
         typedef actionlib::ActionServer<humanoid_nav_msgs::ExecFootstepsAction>::GoalHandle FootstepsGoalH;
         actionlib::ActionServer<humanoid_nav_msgs::ExecFootstepsAction> *stepsActServer;
@@ -129,8 +125,6 @@ class nao_walk_ros
         ros::Publisher odom_pub, lfsr_pub, rfsr_pub, copr_pub, copl_pub, imu_pub, joint_state_pub;
         ros::ServiceServer serv_wakeUp, serv_crouch, serv_sayText;
         ros::ServiceServer serv_makarena, serv_danceEvolution, serv_gangnamStyle, serv_vangelis, serv_taichi, serv_eyeofthetiger, serv_warmhello, serv_tired, serv_balltracker;
-        actionlib::SimpleActionClient<simple_stepplanner2D::RequestStepAction>* fc;
-        simple_stepplanner2D::RequestStepGoal goal;
         ros::ServiceClient sc;
         boost::shared_ptr<nav_msgs::Odometry> odom_msg;
         geometry_msgs::WrenchStamped lfsr_msg, rfsr_msg;
@@ -182,8 +176,7 @@ class nao_walk_ros
         
         void activeCb();
         
-        void  actionCb(const actionlib::SimpleClientGoalState& state,
-        const simple_stepplanner2D::RequestStepResultConstPtr& result);
+
         void reconfigureCB(nao_walk::GaitControlConfig& config, uint32_t level);
         bool wakeUpCb(nao_walk::WakeUp::Request &req, nao_walk::WakeUp::Response &res);
         bool crouchCb(nao_walk::Crouch::Request &req, nao_walk::Crouch::Response &res);

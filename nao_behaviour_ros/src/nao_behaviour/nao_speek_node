@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+import roslib
+roslib.load_manifest('nao_behaviour')
+import rospy
+import actionlib
+
+#from ammar_bridge.msg import speekAction, speekGoal
+import sys
+
+from nao_walk.msg import  speekAction, speekGoal
+
+rospy.init_node('nao_speek')
+client = actionlib.SimpleActionClient('/speed_execution', speekAction)
+client.wait_for_server()
+
+#client2 = actionlib.SimpleActionClient('/ammar_bridge_write/speek_server', speekAction)
+#print 'client started'
+
+#f=True
+#rate = rospy.Rate(10)
+while not rospy.is_shutdown():
+    try:
+        text = raw_input("Say: ")
+    except EOFError:
+        client.wait_for_result()
+        print('\n')
+        quit()
+    #print text
+    goal = speekGoal()
+    goal.text = text
+    client.send_goal(goal)
+    #rate.sleep()
+    #client.wait_for_result(rospy.Duration.from_sec(5.0))
+    client.wait_for_result()
+    #print text
+    #goal.data = text
+    #if f:
+        #client.send_goal(goal)
+    #else:
+        #client2.send_goal(goal)
+    #f = not f
+    #client.wait_for_result(rospy.Duration.from_sec(5.0))
+    
+rospy.spin()

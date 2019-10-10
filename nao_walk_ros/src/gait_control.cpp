@@ -27,52 +27,6 @@ int main( int argc, char** argv )
     nh.getParam("DriverBrokerPort", broker_port);
     nh.getParam("DriverBrokerIP", broker_ip);
  
- 
- 
-  // Create your own broker
-//     boost::shared_ptr<AL::ALBroker> broker;
-//     try
-//     {
-// //         broker = AL::ALBroker::createBroker(broker_name,broker_ip,broker_port,pip,pport,0);
-//     }
-//     catch(...)
-//     {
-//         ROS_ERROR("Failed to connect to Broker at %s:%d!",pip.c_str(),pport);
-// //         return -1;
-//     }
-
-    // Deal with ALBrokerManager singleton (add your broker into NAOqi)
-//     AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
-//     AL::ALBrokerManager::getInstance()->addBroker(broker);
-     
-//     boost::shared_ptr<nao_walk_ros> nao_walk = AL::ALModule::createModule<nao_walk_ros>(broker, "nao_walk_ros");
-   
-//     if(broker->isModulePresent("LowLevelPlanner"))
-//           ROS_INFO("Nao Walk Engine Module is online!");
-//     else
-//     {
-//           ROS_ERROR("Nao Walk Engine Module is offline!");
-//           return -1;
-//     }
-// 
-//     boost::shared_ptr<AL::ALProxy> nao_walk_engine = boost::shared_ptr<AL::ALProxy>(new AL::ALProxy(broker, "LowLevelPlanner"));
-//     nao_walk->setEngineProxy(nao_walk_engine);
-// 
-//    
-//     nao_walk->initialize(nh);
-    // if(!broker->isModulePresent("LowLevelPlanner"))
-    // {
-    //      ROS_ERROR("Could not connect to the Nao robot!");
-    //      AL::ALBrokerManager::getInstance()->killAllBroker();
-    //      AL::ALBrokerManager::kill();
-    //      return -1;
-    // }
-//     boost::shared_ptr<AL::ALBroker> broker;
-//     broker = AL::ALBroker::createBroker(broker_name,broker_ip,broker_port,pip,pport,0);
-    
-//     AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
-//      AL::ALBrokerManager::getInstance()->addBroker(broker);
-// boost::shared_ptr<nao_walk_ros> nao_walk = AL::ALModule::createModule<nao_walk_ros>(broker, "nao_walk_ros");
 
     nao_walk_ros *nao_walk=new nao_walk_ros();
     nao_walk->initialize(nh);

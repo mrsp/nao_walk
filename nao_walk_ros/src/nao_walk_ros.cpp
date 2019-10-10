@@ -6,46 +6,11 @@
 #include <boost/concept_check.hpp>
 
 
-// Called once when the goal becomes active
-void nao_walk_ros::activeCb()
-{
-  ROS_INFO("Goal just went active");
-}
 
-// Called once when the goal completes
-void nao_walk_ros::actionCb(const actionlib::SimpleClientGoalState& state,
-            const simple_stepplanner2D::RequestStepResultConstPtr& result)
-{
-    step_t *step=new step_t;
-    step->x=result->step.pose.x;
-    step->y=result->step.pose.y;
-    step->theta=result->step.pose.theta;
-    
-    if(result->step.leg_id=="lleg")
-       step->leg = LEFT;
-    else
-        step->leg = RIGHT;
-    
-    if (strcmp (result->step.cmd.c_str(),"stand") == 0)
-        step->cmd=(char)STAND;
-    else
-        step->cmd=(char)WALK;
-    
-    command_t command;
-//     command.engine_id=WALK_ENGINE_ID;
-    command.command=STEPS;    
-    command.data_size=sizeof(step_t);
-    command.data=(void*)step;
-    
-    addCmd(command);    
-    ROS_INFO("%f, %f, %f, %d",step->x,step->y,step->theta,step->cmd);
-    simpleStepAvailable=true;
-}
 
 
 nao_walk_ros::nao_walk_ros()
 {    
-    simpleStepAvailable=true;
     hasStepGoal=false;
     hasBehaveGoal=false;
 //     socketClient.socketConnect("Odysseus.ocal",8080);
@@ -569,11 +534,7 @@ void nao_walk_ros::initialize(ros::NodeHandle nh)
         "/speed_execution",boost::bind(&nao_walk_ros::speekExecutionCallback,this,_1),false);      
     speekActServer->start();    
 
-    fc = new actionlib::SimpleActionClient<simple_stepplanner2D::RequestStepAction>("/nao_motion/stepplanner/planfootstep",true);
-    ROS_INFO("Waiting for action server to start.");
-    // wait for the action server to start
-    fc->waitForServer(); //will wait for infinite time
-    ROS_INFO("Action server is online");
+
 
 
     dynamic_recfg_ = boost::make_shared< dynamic_reconfigure::Server<nao_walk::GaitControlConfig> >(nh);

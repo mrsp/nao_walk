@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   actionlib_msgs
   actionlib
-  simple_stepplanner2D
   message_generation
   tf
   humanoid_nav_msgs
