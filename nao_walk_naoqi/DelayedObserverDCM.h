@@ -36,6 +36,8 @@ public:
      *  @brief filters the ZMP measurement from the CoP using
      *  also the COM measured by the encoders
      */
+    float Observer_COP, Observer_CoM;
+
     bool firstrun;
     void setInitialState(Vector4f x_);
     void update(float u_, float zmp_, float dcm_, float com_);

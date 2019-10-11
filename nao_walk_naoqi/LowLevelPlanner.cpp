@@ -1351,12 +1351,18 @@ void LowLevelPlanner::setRobotConfig(float *value)
         engine->NaoLIPM.Observer_CoMX = value[2];
         engine->NaoLIPM.Observer_CoMY = value[3];
         
+        engine->NaoMPCDCM.dObsDCMx.Observer_COP = value[0];
+        engine->NaoMPCDCM.dObsDCMy.Observer_COP = value[1];
+        engine->NaoMPCDCM.dObsDCMx.Observer_CoM = value[2];
+        engine->NaoMPCDCM.dObsDCMy.Observer_CoM = value[3];
+
+
 
         engine->NaoPosture.Kcx_ = value[4];
         engine->NaoPosture.Tcx_ = value[5];
         engine->NaoPosture.Kcy_ = value[6];
         engine->NaoPosture.Tcy_ = value[7];
-        
+
         engine->NaoPosture.amX = value[8];
         engine->NaoPosture.amY = value[9];
         engine->NaoVRPToCoM.gain_x = value[11];

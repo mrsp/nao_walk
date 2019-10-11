@@ -653,12 +653,12 @@ void WalkEngine::Calculate_Desired_COM()
             NaoMPCDCM.setInitialState(Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
             NaoMPCDCM.firstrun = false;
          }
-         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMm(0),CoMm(1)), Vector2f(copi(0),copi(1)));
 
 
         CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
         Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
-
+        CoM_c = Vector3d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d,NaoRobot.getWalkParameter(ComZ));
 	
     /*
         if(NaoLIPM.firstrun)

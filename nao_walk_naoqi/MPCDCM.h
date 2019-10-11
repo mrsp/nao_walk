@@ -17,7 +17,6 @@ class MPCDCM
         RobotParameters &NaoRobot;
 
 
-        DelayedObserverDCM dObsDCMx, dObsDCMy;
 
         float    du_x, du_y, qx, qv, u_x, u_y;
         Vector2f DCM_, VRP_;
@@ -32,7 +31,7 @@ class MPCDCM
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         float vrpx_d,comx_d,vrpy_, vrpx_,comdx_d,dcmx_d,dcmdx_d, vrpy_d,comy_d,comdy_d,dcmy_d,dcmdy_d,  comddx_d, comddy_d;
         bool firstrun;
-
+        DelayedObserverDCM dObsDCMx, dObsDCMy;
         MPCDCM(RobotParameters &robot);
         
         void setInitialState(Vector2f DCM, Vector2f CoM, Vector2f ZMP);

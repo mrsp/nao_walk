@@ -105,7 +105,7 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
 
     R.resize(Np,Np);
     R.setIdentity();
-    R*=5.0e-3;
+    R*=1.0e-5;
 
     qx = 0.1;
     qv = 1.0;
