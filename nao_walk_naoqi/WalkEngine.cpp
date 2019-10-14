@@ -172,10 +172,10 @@ NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) 
     leftGRF_LPF->init("LeftFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     rightGRF_LPF->init("RightFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     
-    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
-    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
-    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
-    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
+    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
+    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
+    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
+    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
     
     AccX_LPF->init("AccelerometerX", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
     AccY_LPF->init("AccelerometerY", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
@@ -656,8 +656,8 @@ void WalkEngine::Calculate_Desired_COM()
          NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMm(0),CoMm(1)), Vector2f(copi(0),copi(1)));
 
 
-        CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
-        Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
+       // CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
+        //Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
         CoM_c = Vector3d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d,NaoRobot.getWalkParameter(ComZ));
 	
     /*
@@ -1013,11 +1013,11 @@ std::vector<float> WalkEngine::Calculate_IK()
         std::cerr << "Left Leg EMPTY VECTOR " << std::endl;
 
     /** Ankle Correction with PID Control **/
-        NaoPosture.torsoStabilizer(Angle(0), Angle(1), 0.0, 0.0, ret[2], ret[8], ret[1], ret[7]);
-        ret[2]=NaoPosture.lhip_Pitch;
-        ret[8]=NaoPosture.rhip_Pitch;
-        ret[1]=NaoPosture.lhip_Roll;
-        ret[7]=NaoPosture.rhip_Roll;
+        // NaoPosture.torsoStabilizer(Angle(0), Angle(1), 0.0, 0.0, ret[2], ret[8], ret[1], ret[7]);
+        // ret[2]=NaoPosture.lhip_Pitch;
+        // ret[8]=NaoPosture.rhip_Pitch;
+        // ret[1]=NaoPosture.lhip_Roll;
+        // ret[7]=NaoPosture.rhip_Roll;
 
     /*
     if(GroundContact)

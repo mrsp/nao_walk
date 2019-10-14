@@ -1363,8 +1363,8 @@ void LowLevelPlanner::setRobotConfig(float *value)
         engine->NaoPosture.Kcy_ = value[6];
         engine->NaoPosture.Tcy_ = value[7];
 
-        engine->NaoPosture.amX = value[8];
-        engine->NaoPosture.amY = value[9];
+        engine->NaoMPCDCM.dObsDCMx.Observer_DCM = value[8];
+        engine->NaoMPCDCM.dObsDCMy.Observer_DCM = value[9];
         engine->NaoVRPToCoM.gain_x = value[11];
         engine->NaoVRPToCoM.gain_y = value[12];
         std::cout<<"Config change"<<std::endl;

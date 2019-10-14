@@ -4,9 +4,7 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include "RobotParameters.h"
-#include <queue>
 
-#define ZMPDELAY 18
 using namespace Eigen;
 using namespace std;
 
@@ -24,8 +22,6 @@ private:
     Matrix4_1f B;
     Matrix4_2f Lcom;
     Matrix4_3f L;
-    //std::queue<KVecFloat4> xbuffer;
-    std::queue<VectorXf> xbuffer;
 
     Vector4f x;
     void updateVars();
@@ -36,7 +32,7 @@ public:
      *  @brief filters the ZMP measurement from the CoP using
      *  also the COM measured by the encoders
      */
-    float Observer_COP, Observer_CoM;
+    float Observer_COP, Observer_CoM, Observer_DCM;
 
     bool firstrun;
     void setInitialState(Vector4f x_);

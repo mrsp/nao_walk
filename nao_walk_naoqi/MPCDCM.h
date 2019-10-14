@@ -20,7 +20,7 @@ class MPCDCM
 
         float    du_x, du_y, qx, qv, u_x, u_y;
         Vector2f DCM_, VRP_;
- 	    Vector4f x,y,x_,y_;
+ 	    Vector4f x,y,x_,y_, xOUT, yOUT;
         Vector3f xe, ye;
         MatrixXf Fx, Fv, Fxu, Fvu, R, Qx, Qv, K_X, K_V,H , tmpb, H_inv, Ad, Ae, Cd, A, L;
         VectorXf K_v, VRPRefX, VRPRefY, Cksi,  Ce, Cx, Be, Bd, temp, K_x, B, C;
