@@ -172,10 +172,10 @@ NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) 
     leftGRF_LPF->init("LeftFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     rightGRF_LPF->init("RightFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     
-    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
-    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
-    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
-    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),2.5);
+    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
+    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
+    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
+    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
     
     AccX_LPF->init("AccelerometerX", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
     AccY_LPF->init("AccelerometerY", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
@@ -646,7 +646,7 @@ void WalkEngine::Calculate_Desired_COM()
         CoMp=KVecFloat2(CoMm(0),CoMm(1));
     
 
-
+    /*
 
         if(NaoMPCDCM.firstrun)
         {	
@@ -659,20 +659,23 @@ void WalkEngine::Calculate_Desired_COM()
        // CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
         //Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
         CoM_c = Vector3d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d,NaoRobot.getWalkParameter(ComZ));
-	
-    /*
+	*/
+
         if(NaoLIPM.firstrun)
         {	
-            NaoLIPM.setInitialState(KVecFloat2(CoMp(0),CoMp(1)), KVecFloat2(copi(0),copi(1)));
+            NaoLIPM.setInitialState(KVecFloat2(CoMm(0),CoMm(1)), KVecFloat2(copi(0),copi(1)));
             NaoLIPM.firstrun = false;
 
 
          }
         
 
-    NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copi(0),copi(1));
-    CoM_c = NaoVRPToCoM.Control(Vector2d(NaoLIPM.comx_d,NaoLIPM.comy_d),Vector2d(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d), Vector2d(copi(0),copi(1)), Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
-    */
+    //NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copi(0),copi(1));
+    NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), nipmEKF->velX,nipmEKF->velY,copi(0),copi(1));
+    CoM_c = Vector3d(NaoLIPM.comx_d,NaoLIPM.comy_d,NaoRobot.getWalkParameter(ComZ));
+
+    //CoM_c = NaoVRPToCoM.Control(Vector2d(NaoLIPM.comx_d,NaoLIPM.comy_d),Vector2d(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d), Vector2d(copi(0),copi(1)), Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
+ 
 
     /*
         flog.insert("stepL_ax",tp.stepl_a(0));
