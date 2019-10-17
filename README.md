@@ -4,9 +4,8 @@
 * nao_walk_naoqi: A C++ naoqi module that achieves real-time omni-directional walking. This module needs to be cross-compiles the cross naoqi sdk and uploaded to NAO.
 
 * nao_walk_ros: A ROS/C++ wrapper that enables real-time communication with NAO without relying on naoqi-sdk.
-<img src="http://users.ics.forth.gr/~spiperakis/hill_nao.gif?raw=true" width="200px">
-<img src="http://users.ics.forth.gr/~spiperakis/grass_nao.gif?raw=true" width="200px">
-
+![NAO on a hill](http://users.ics.forth.gr/~spiperakis/hill_nao.gif)
+![NAO on grass](http://users.ics.forth.gr/~spiperakis/grass_nao.gif)
 ## Prerequisites
 * Ubuntu 16.04 and later
 * ROS kinetic and later
