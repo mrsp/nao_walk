@@ -5,8 +5,8 @@
 
 * nao_walk_ros: A ROS/C++ wrapper that enables real-time communication with NAO without relying on naoqi-sdk.
 
-![](http://users.ics.forth.gr/~spiperakis/hill_nao.gif " ")
-![](http://users.ics.forth.gr/~spiperakis/grass_nao.gif " ")
+![](http://users.ics.forth.gr/~spiperakis/hill_nao.gif)
+![](http://users.ics.forth.gr/~spiperakis/grass_nao.gif)
 
 
 ## Prerequisites
