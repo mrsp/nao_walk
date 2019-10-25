@@ -4,7 +4,6 @@
 * nao_walk_naoqi: A C++ naoqi module that achieves real-time omni-directional walking. This module needs to be cross-compiles the cross naoqi sdk and uploaded to NAO.
 
 * nao_walk_ros: A ROS/C++ wrapper that enables real-time communication with NAO without relying on naoqi-sdk.
-
 [![NAO Outdoors Walking](https://img.youtube.com/vi/DD0I0H3wR7c/0.jpg)](https://www.youtube.com/watch?v=DD0I0H3wR7c)
 
 
