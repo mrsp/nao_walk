@@ -66,11 +66,13 @@ Stepplanner2D.h
 Stepplanner2D.cpp
 LIPMThread.h
 LIPMThread.cpp
+ZMPFilter.h
+ZMPFilter.cpp
 )
 
 
 
-#Create the KWalk Module
+#Create the Walk Module
 qi_create_lib(nao_walkF SHARED ${_srcs} SUBFOLDER naoqi)
 
 

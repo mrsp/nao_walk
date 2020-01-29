@@ -2,7 +2,7 @@
 #define __PCTHREAD_H__
 
 
-#define PWindow 101
+#define PWindow 151
 
 
 #include "KMat.hpp"
@@ -10,7 +10,7 @@
 #include <boost/circular_buffer.hpp>
 #include "RobotParameters.h"
 #include <queue>
-#define ZMPKALMANDELAY 3
+#define ZMPKALMANDELAY 5
 using namespace std;
 class Dynamics
 {
@@ -102,7 +102,7 @@ public:
     void setInitialState(KVecFloat2 CoM, KVecFloat2 ZMP);
     void Control(boost::circular_buffer<KVecFloat3> & ZmpBuffer, float CoMMeasuredX, float CoMMeasuredY, float CoMMeasuredZ, float ZMPMeasuredX, float ZMPMeasuredY);
 
-    float vrpx_d, vrpy_d, comx_d, comy_d, comdx_d, comdy_d, zmpx, zmpy, dcmx_d, dcmy_d, vrpdx_d, vrpdy_d, zmpx_ref, zmpy_ref;
+    float vrpx_d, vrpy_d, comx_d, comy_d, comdx_d, comdy_d;
     float Observer_CoMX,Observer_CoMY,Observer_COPX,Observer_COPY;
    bool firstrun;
 };

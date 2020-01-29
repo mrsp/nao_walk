@@ -48,8 +48,6 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
 	
     x.setZero();
     y.setZero();
-    xOUT.setZero();
-    yOUT.setZero();
     x_.setZero();
     y_.setZero();
     xe.setZero();
@@ -107,10 +105,10 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
 
     R.resize(Np,Np);
     R.setIdentity();
-    R*=1.0e-2;
+    R*=1.0e-4;
 
-    qx = 1.0;
-    qv = 0.1;
+    qx = 0.05;
+    qv = 0.02;
 
    
     Qv.resize(Np,Np);
@@ -180,24 +178,20 @@ MPCDCM::MPCDCM(RobotParameters &robot):NaoRobot(robot), dObsDCMx(robot), dObsDCM
 void MPCDCM::setInitialState(Vector2f DCM, Vector2f CoM, Vector2f VRP)
 {
 
-    dObsDCMx.setInitialState(Vector4f(CoM(0),DCM(0),VRP(0),0.0));
-    dObsDCMy.setInitialState(Vector4f(CoM(1),DCM(1),VRP(1),0.0));
+    // dObsDCMx.setInitialState(Vector4f(CoM(0),DCM(0),VRP(0),0.0));
+    // dObsDCMy.setInitialState(Vector4f(CoM(1),DCM(1),VRP(1),0.0));
    
    
-    
+    // xe(2) = VRP(0);
+    // ye(2) = VRP(1);
 
-    // dObsDCMx.setInitialState(Vector4f(0,0,0,0));
-    // dObsDCMy.setInitialState(Vector4f(0,0,0,0));
-   
-    x(0) = CoM(0);
-    x(1) = DCM(0);
-    x(2) = VRP(0);
-    y(0) = CoM(1);
-    y(1) = DCM(1);
-    y(2) = VRP(1);
 
-    x_ = x;
-    y_ = y; 
+    dObsDCMx.setInitialState(Vector4f(0,0,0,0));
+    dObsDCMy.setInitialState(Vector4f(0,0,0,0));
+   
+   
+    xe(2) = 0.0;
+    ye(2) = 0.0;
 }
 
 
@@ -224,19 +218,8 @@ void MPCDCM::Control(boost::circular_buffer<KVecFloat3> & VRPRef, Vector2f DCM, 
      }
 
 
-	//Observer for MPC 
-	x_ = x;
-	y_ = y;  
-    
-    
-    // x(0) = CoM(0);
-    // x(1) = DCM(0);
-    // x(2) = VRP(0);
-    // y(0) = CoM(1);
-    // y(1) = DCM(1);
-    // y(2) = VRP(1);
-    x =  dObsDCMx.getState();
-    y =  dObsDCMy.getState();
+	
+
 	xe(0) = x(1)-x_(1);
     xe(1) = x(2)-x_(2);
     xe(2) = x(2);
@@ -257,18 +240,25 @@ void MPCDCM::Control(boost::circular_buffer<KVecFloat3> & VRPRef, Vector2f DCM, 
 	u_y += du_y;
 
 
-	// //Observer for MPC 
-	dObsDCMx.update(u_x,VRP(0),DCM(0),CoM(0));
-    dObsDCMy.update(u_y,VRP(1),DCM(1),CoM(1));
-    xOUT =  dObsDCMx.getState();
-    yOUT =  dObsDCMy.getState();
+	//Observer for MPC 
+	x_ = x;
+	y_ = y;  
+    
+    
+	dObsDCMx.update(u_x,VRP(0),CoM(0));
+    dObsDCMy.update(u_y,VRP(1),CoM(1));
+    x =  dObsDCMx.getState();
+    y =  dObsDCMy.getState();
+    
+    cout<<"State X "<<x<<endl;
+    cout<<"State Y "<<y<<endl;
 	//Desired Gait Pattern Reference
-	comx_d = xOUT(0);
-	comy_d = yOUT(0);
-	dcmx_d = xOUT(1);
-	dcmy_d = yOUT(1);
-   	vrpx_d = xOUT(2);
-    vrpy_d = yOUT(2);
+	comx_d = x(0);
+	comy_d = y(0);
+	dcmx_d = x(1);
+	dcmy_d = y(1);
+   	vrpx_d = x(2);
+    vrpy_d = y(2);
 
 
 

@@ -13,7 +13,7 @@ enum
     mass,omega,Early_Contact_threshold, Ground_Contact_threshold,LegUpThres,LegLowThres, CoM_Stiffness, CoM_Damping, PreviewWindow,
     StepPlanSize, com_q, comd_q, fd_q, com_r, comdd_r, I_xx, I_yy, I_zz, bias_fx, bias_fy, bias_fz, transitionSI_instructions,
     CoM_state_uncertainty, DCM_state_uncertainty, VRP_state_uncertainty, External_wrench_uncertainty,  CoM_noise, COP_Noise, StepXF, StepXH, StepYL, StepYR, 
-    Tcx, Tcy, Ta, Tn, Kcx,Kcy, Ka, Kn, Tss_min, Tss_max, StepPlanAdjustment, velocityControl, ParametersSize
+    Tc, Ta, Tn, Kc, Ka, Kn, Tss_min, Tss_max, StepPlanAdjustment, velocityControl, alpha_ZMPFilter, ParametersSize
 };
 
 static const char * robotParameterNames[] =
@@ -22,7 +22,7 @@ static const char * robotParameterNames[] =
     "Ground_Contact_threshold","LegUpThres","LegLowThres", "CoM_Stiffness", "CoM_Damping", "PreviewWindow",
     "StepPlanSize" "com_q" "comd_q" "fd_q" "com_r" "comdd_r" "I_xx" "I_yy" "I_zz" "bias_fx" "bias_fy" "bias_fz"  "transitionSI_instructions"
     "CoM_state_uncertainty" "DCM_state_uncertainty" "VRP_state_uncertainty" "External_wrench_uncertainty"  "CoM_noise" "COP_Noise" "StepXF" "StepXH" "StepYL" "StepYR"
-    "Tcx" "Tcy" "Ta" "Tn" "Kcx" "Kcy" "Ka" "Kn" "Tss_min" "Tss_max" "StepPlanAdjustment" "velocityControl" "ParametersSize"
+    "Tc" "Ta" "Tn" "Kc" "Ka" "Kn" "Tss_min" "Tss_max" "StepPlanAdjustment" "velocityControl" "alpha_ZMPFilter" "ParametersSize"
 };
 
 
@@ -44,19 +44,19 @@ public:
         WalkParameters[Td] = 0.05;
         WalkParameters[StepX] = 0.165;
         WalkParameters[StepY] = 0.085;
-        WalkParameters[StepZ] = 0.0165;
+        WalkParameters[StepZ] = 0.0175;
         WalkParameters[H0] = 0.095/2.00;
-        WalkParameters[HY] = 0.005;   
+        WalkParameters[HY] = 0.01;   
         WalkParameters[HX] = -0.025; 
         WalkParameters[ComZ] = 0.26;
-        WalkParameters[Tstep] = 0.35; //0.28
+        WalkParameters[Tstep] = 0.4; //0.28
         WalkParameters[Tinit]= 0.4;
         WalkParameters[Tss] = 0.3; //0.3
         WalkParameters[Tds] = 0.1; //0.05
-        WalkParameters[MaxStepX] = 0.02;
-        WalkParameters[MaxStepY] = 2.0*WalkParameters[H0] + 0.0;
+        WalkParameters[MaxStepX] = 0.025;
+        WalkParameters[MaxStepY] = 2.0*WalkParameters[H0] + 0.01;
         WalkParameters[MaxStepTheta] = 0.349065850401537;
-        WalkParameters[MinStepX] = -0.015;
+        WalkParameters[MinStepX] = -0.010;
         WalkParameters[MinStepY] =  2.0*WalkParameters[H0];
         WalkParameters[MinStepTheta] = -0.050614548300834;
         WalkParameters[g] = 9.80665;
@@ -65,10 +65,10 @@ public:
         WalkParameters[Init_instructions]=ceil(WalkParameters[Tinit]/WalkParameters[Ts]);
         WalkParameters[SS_instructions]=ceil(WalkParameters[Tss]/WalkParameters[Ts]);
         WalkParameters[DS_instructions]=ceil(WalkParameters[Tds]/WalkParameters[Ts]);
-        WalkParameters[Early_Contact_threshold]=60.0f;
+        WalkParameters[Early_Contact_threshold]=80.0f;
         WalkParameters[Ground_Contact_threshold]=12.0f;
         WalkParameters[LegUpThres] = 22.0f;
-        WalkParameters[LegLowThres] = 12.0f;
+        WalkParameters[LegLowThres] = 0.1f;
         WalkParameters[CoM_Stiffness] = 22000.0f;
         WalkParameters[CoM_Damping] = 1100.0f;
         WalkParameters[PreviewWindow] = 150;
@@ -95,19 +95,17 @@ public:
         WalkParameters[StepYL] = 0.02;
         WalkParameters[StepYR] = -0.02;
         WalkParameters[transitionSI_instructions] = 250;
+        WalkParameters[Tc] = 0.1; 
         WalkParameters[Ta] = 0.1;  //0.1
         WalkParameters[Tn] = 0.1; //0.1
-        WalkParameters[Kcx] = 1.25;   //5.0
-        WalkParameters[Tcx] = 0.05; 
-        WalkParameters[Kcy] = 2.5;   //5.0
-        WalkParameters[Tcy] = 0.05; 
-
+        WalkParameters[Kc] = 2.5;   //5.0
         WalkParameters[Ka] = 0.05; //0.05
         WalkParameters[Kn] = 0.005; //0.005
         WalkParameters[Tss_min] = 0.28;
         WalkParameters[Tss_max] = 0.35;
-        WalkParameters[StepPlanAdjustment] = true;
-        WalkParameters[velocityControl] = true;
+        WalkParameters[StepPlanAdjustment] = false;
+        WalkParameters[velocityControl] = false;
+        WalkParameters[alpha_ZMPFilter] = 0.35;
     }
     
     float getWalkParameter(int);

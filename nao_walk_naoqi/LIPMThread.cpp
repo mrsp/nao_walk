@@ -150,10 +150,10 @@ Gd(99) =0.33708;
     dcmy_d = 0;
     std::cout<<"Online Pattern Planner with Preview Controller Initialized Successfully"<<std::endl;
     firstrun = true;
-    Observer_CoMX = 0.4;
-	Observer_CoMY = 0.6;
+    Observer_CoMX = 0.5;
+	Observer_CoMY = 1.0;
 	Observer_COPX = 0.35;
-	Observer_COPY = 0.7;
+	Observer_COPY = 0.5;
 }
 void LIPMThread::setInitialState( KVecFloat2 CoM, KVecFloat2 ZMP)
 {
@@ -243,8 +243,8 @@ void LIPMThread::Control(boost::circular_buffer<KVecFloat3> & ZmpBuffer, float C
     uX=-Statefbx-Integrationfbx-Predictionfbx;
     uY=-Statefby-Integrationfby-Predictionfby;
     //Updating the Dynamics
- //  KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,ZMPMeasuredX);
-//   KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,ZMPMeasuredY);
+   KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,ZMPMeasuredX);
+   KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,ZMPMeasuredY);
 
  //Updating the Dynamics
 
@@ -253,8 +253,8 @@ void LIPMThread::Control(boost::circular_buffer<KVecFloat3> & ZmpBuffer, float C
     DynamicsY.Observer_CoM= Observer_CoMY;
     DynamicsX.Observer_COP= Observer_COPX;
     DynamicsY.Observer_COP= Observer_COPY;
-    KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,KalmanX.StatePredict(0));
-    KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,KalmanY.StatePredict(0));
+    // KVecFloat2 errorX=KVecFloat2(CoMMeasuredX,KalmanX.StatePredict(0));
+    // KVecFloat2 errorY=KVecFloat2(CoMMeasuredY,KalmanY.StatePredict(0));
 
 
 

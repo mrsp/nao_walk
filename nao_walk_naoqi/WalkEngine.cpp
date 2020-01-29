@@ -3,7 +3,7 @@
 #define DEF_STEP_ID -1
 
 WalkEngine::WalkEngine(RobotParameters &rp) : NaoLIPM(rp),NaoRobot(rp),stepAnkleQ(rp.getWalkParameter(StepPlanSize)), velocityQ(rp.getWalkParameter(StepPlanSize)),tp(rp), sp(rp), 
-NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) // flog("log",RAW,20)
+NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp),  zmpFilter(rp)// flog("log",RAW,20)
 {
     
     FSRDataInit = false;
@@ -18,7 +18,7 @@ NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) 
     nipmEKF->init();
     nipmEKF->setdt(NaoRobot.getWalkParameter(Ts));
     nipmEKF->setParams(NaoRobot.getWalkParameter(mass), NaoRobot.getWalkParameter(I_xx),
-                      NaoRobot.getWalkParameter(I_yy), NaoRobot.getWalkParameter(g), NaoRobot.getWalkParameter(ComZ));
+                      NaoRobot.getWalkParameter(I_yy), NaoRobot.getWalkParameter(g));
   
     Inertia.setZero();  
     Inertia(0,0) = NaoRobot.getWalkParameter(I_xx);
@@ -34,7 +34,7 @@ NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) 
     stepPhaseId = 0;
     ci.targetSupport=KDeviceLists::SUPPORT_LEG_NONE;
     ci.step_id=DEF_STEP_ID;
-
+    cstep_id = DEF_STEP_ID;
     executedStep = ci;
     _isFootStepExecuted = false;
     isFSRInitialized = false;
@@ -172,10 +172,10 @@ NaoPosture(rp), NaoMPCDCM(rp), NaoVRPToCoM(rp), NaoFeetEngine(rp),  zmpDist(rp) 
     leftGRF_LPF->init("LeftFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     rightGRF_LPF->init("RightFoot",1.0/NaoRobot.getWalkParameter(Ts),2.5);
     
-    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
-    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
-    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
-    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),0.5);
+    coplx_LPF->init("LeftCOPX", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
+    coply_LPF->init("LeftCOPY", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
+    coprx_LPF->init("RightCOPX", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
+    copry_LPF->init("RightCOPY", 1.0/NaoRobot.getWalkParameter(Ts),1.5);
     
     AccX_LPF->init("AccelerometerX", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
     AccY_LPF->init("AccelerometerY", 1.0/NaoRobot.getWalkParameter(Ts),4.0);
@@ -306,6 +306,8 @@ void WalkEngine::feed()
 
 
 
+
+
         executedStep = ci;
         if(!_isFootStepExecuted)
         {
@@ -334,12 +336,10 @@ void WalkEngine::feed()
                 }
                 j++;
             }
-            tp.plan(KVecFloat2(nipmEKF->DCM_lp(0),nipmEKF->DCM_lp(1)),   KVecFloat2(copi(0),copi(1)), nipmEKF->comZ, Angle(0),Angle(1),NaoRobot.getWalkParameter(StepPlanAdjustment),postureInitialized);
-
-            // if(postureInitialized)
-            //     tp.plan(KVecFloat2(nipmEKF->DCM_lp(0),nipmEKF->DCM_lp(1)), KVecFloat2(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d),NaoRobot.getWalkParameter(StepPlanAdjustment));
-            // else
-            //     tp.plan(KVecFloat2(nipmEKF->DCM_lp(0),nipmEKF->DCM_lp(1)),  KVecFloat2(copi(0),copi(1)),false);
+            if(postureInitialized)
+                tp.plan(KVecFloat2(nipmEKF->DCM_lp(0),nipmEKF->DCM_lp(1)), KVecFloat2(copi(0),copi(1)),NaoRobot.getWalkParameter(StepPlanAdjustment));
+            else
+                tp.plan(KVecFloat2(nipmEKF->DCM_lp(0),nipmEKF->DCM_lp(1)), KVecFloat2(copi(0),copi(1)),false);
 
             _isFootStepExecuted=true;
             stepAnkleQ.pop_front();
@@ -611,12 +611,11 @@ void WalkEngine::stateEstimationLoop()
         Gyro  = Vector3f(GyroX_LPF->filter(Gyro(0)),GyroY_LPF->filter(Gyro(1)),Gyro(2));
 
 
-       
+      
+    
 
         AccW = Tib_eig.linear()*Acc;
         GyroW = Tib_eig.linear()*Gyro;
-        computeGyrodot();
-       
 
         if (nipmEKF->firstrun){
             nipmEKF->setCoMPos(CoMm);
@@ -624,9 +623,16 @@ void WalkEngine::stateEstimationLoop()
             nipmEKF->firstrun = false;
         }
 
+        computeGyrodot();
         nipmEKF->predict(copi,fis, Tib_eig.linear()*Inertia*Gyrodot);
         
         nipmEKF->update(AccW,  CoMm,  Tib_eig.linear()*Gyro, Tib_eig.linear()*Gyrodot);
+        //cout<<"CoM E/M"<<endl;
+        //cout<<nipmEKF->comX<<" "<<nipmEKF->comY<<" "<<nipmEKF->comZ<<endl;
+        //cout<<CoMm<<endl;
+        //cout<<"ZMP E/M"<<endl;
+        //cout<<copKF.zmpx<<" "<<copKF.zmpy<<endl;
+        //cout<<copi(0)<<" "<<copi(1)<<endl;
     }
 }
 
@@ -646,80 +652,64 @@ void WalkEngine::Calculate_Desired_COM()
         CoMp=KVecFloat2(CoMm(0),CoMm(1));
     
 
-    /*
 
+    /*
+ 
         if(NaoMPCDCM.firstrun)
         {	
-            NaoMPCDCM.setInitialState(Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+            NaoMPCDCM.setInitialState(Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)),Vector2f(CoMp(0),CoMp(1)), Vector2f(copKF.zmpx,copKF.zmpy));
             NaoMPCDCM.firstrun = false;
+
+
          }
-         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)), Vector2f(CoMm(0),CoMm(1)), Vector2f(copi(0),copi(1)));
-
-
-       // CoM_c= NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d), Vector2d(copi(0),copi(1)), 
-        //Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
-        CoM_c = Vector3d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d,NaoRobot.getWalkParameter(ComZ));
-	*/
+         NaoMPCDCM.Control(tp.ZMPbuffer,Vector2f(nipmEKF->DCM(0),nipmEKF->DCM(1)),Vector2f(CoMp(0),CoMp(1)), Vector2f(copi(0),copi(1)));
+         CoM_c=NaoVRPToCoM.Control(Vector2d(NaoMPCDCM.comx_d,NaoMPCDCM.comy_d),Vector2d(NaoMPCDCM.comdx_d,NaoMPCDCM.comdy_d),Vector2d(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d),Vector2d(copKF.zmpx,
+     copKF.zmpy), Vector2d(CoMm(0),CoMm(1)));
+    
 
         if(NaoLIPM.firstrun)
         {	
-            NaoLIPM.setInitialState(KVecFloat2(CoMm(0),CoMm(1)), KVecFloat2(copi(0),copi(1)));
+            NaoLIPM.setInitialState(KVecFloat2(CoMp(0),CoMp(1)), KVecFloat2(copi(0),copi(1)));
             NaoLIPM.firstrun = false;
 
 
          }
-        
+    */
+    //NaoLIPM.Control(tp.ZMPbuffer,nipmEKF->comX,nipmEKF->comY, nipmEKF->comZ,copi(0),copi(1));
+    
+    Vector3f zmp_f = zmpFilter.filter(copi,Vector3f(CoMp(0),CoMp(1),CoMp(2)),AccW,Gyro,Gyrodot,Tib_eig.linear());
 
-    //NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copi(0),copi(1));
-    NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), nipmEKF->velX,nipmEKF->velY,copi(0),copi(1));
-    CoM_c = Vector3d(NaoLIPM.comx_d,NaoLIPM.comy_d,NaoRobot.getWalkParameter(ComZ));
+    NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copi(0),copi(1));
 
-    //CoM_c = NaoVRPToCoM.Control(Vector2d(NaoLIPM.comx_d,NaoLIPM.comy_d),Vector2d(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d), Vector2d(copi(0),copi(1)), Angle(0), Angle(1), GyroW(0), GyroW(1), GroundContact);
- 
+     CoM_c=NaoVRPToCoM.Control(Vector2d(NaoLIPM.comx_d,NaoLIPM.comy_d),Vector2d(NaoLIPM.comdx_d,NaoLIPM.comdy_d),Vector2d(NaoLIPM.zmpx_ref,NaoLIPM.zmpy_ref), 
+     Vector2d(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d), Vector2d(CoMp(0),CoMp(1)));
 
-    /*
-        flog.insert("stepL_ax",tp.stepl_a(0));
-        flog.insert("stepL_ay",tp.stepl_a(1));
-        flog.insert("stepL_aw",tp.stepl_a(2));
-        flog.insert("stepR_ax",tp.stepr_a(0));
-        flog.insert("stepR_ay",tp.stepr_a(1));
-        flog.insert("stepR_aw",tp.stepr_a(2));
-
-        flog.insert("stepL_bx",tp.stepl_b(0));
-        flog.insert("stepL_by",tp.stepl_b(1));
-        flog.insert("stepL_bw",tp.stepl_b(2));
-        flog.insert("stepR_bx",tp.stepr_b(0));
-        flog.insert("stepR_by",tp.stepr_b(1));
-        flog.insert("stepR_bw",tp.stepr_b(2));
-
-
+    //NaoLIPM.Control(tp.ZMPbuffer,CoMp(0),CoMp(1), CoMm(2),copKF.zmpx,copKF.zmpy);
+  
+   /*
         flog.insert("PatternZMPx",NaoLIPM.vrpx_d);
         flog.insert("PatternZMPy",NaoLIPM.vrpy_d);
-        flog.insert("PatternCoMx",NaoLIPM.comx_d);
-        flog.insert("PatternCoMy",NaoLIPM.comy_d);
+        
+        flog.insert("PatternZMPdx",NaoLIPM.vrpdx_d);
+        flog.insert("PatternZMPdy",NaoLIPM.vrpdy_d);
+
         flog.insert("PatternDCMx",NaoLIPM.dcmx_d);
         flog.insert("PatternDCMy",NaoLIPM.dcmy_d);
-        flog.insert("PatternCoMdx",NaoLIPM.comdx_d);
-        flog.insert("PatternCoMdy",NaoLIPM.comdy_d);
-
-        flog.insert("SEROWCoMx",nipmEKF->comX);
-        flog.insert("SEROWCoMy",nipmEKF->comY);
-        flog.insert("SEROWCoMz",nipmEKF->comZ);
-        flog.insert("SEROWDCMx",nipmEKF->DCM(0));
-        flog.insert("SEROWDCMy",nipmEKF->DCM(1));
-        flog.insert("SEROWCoMdx",nipmEKF->velX);
-        flog.insert("SEROWCoMdy",nipmEKF->velY);
-        flog.insert("SEROWCoMdz",nipmEKF->velZ);
-
 
         flog.insert("COPx",copi(0));
         flog.insert("COPy",copi(1));
         flog.insert("fis",fis(2));
+
         flog.insert("refZMPx",tp.ZMPbuffer[0](0));
         flog.insert("refZMPy",tp.ZMPbuffer[0](1));
+
+        flog.insert("COMx",NaoLIPM.comx_d);
+        flog.insert("COMy",NaoLIPM.comy_d);
+
         flog.insert("COMKinx",CoMm(0));
         flog.insert("COMKiny",CoMm(1));
-        flog.insert("COMKinz",CoMm(2)); 
+        flog.insert("COMKinz",CoMm(2));
+        
         flog.insert("odomx",odomTrans(0));
         flog.insert("odomy",odomTrans(1));
         flog.insert("odomz",odomTrans(2));
@@ -727,15 +717,17 @@ void WalkEngine::Calculate_Desired_COM()
         flog.insert("odomqy",odomQuat.y());
         flog.insert("odomqz",odomQuat.z());
         flog.insert("odomqw",odomQuat.w());
+
         flog.insert("Accx",AccW(0));
         flog.insert("Accy",AccW(1));
         flog.insert("Accz",AccW(2));
+        
         flog.insert("Gyrox",GyroW(0));
         flog.insert("Gyroy",GyroW(1));
         flog.insert("Gyroz",GyroW(2));
         flog.periodic_save();
+    
     */
-   
     
      
   
@@ -919,23 +911,23 @@ std::vector<float> WalkEngine::Calculate_IK()
 
     if(GroundContact)
     {
-        if (forceRw(2)>NaoRobot.getWalkParameter(Early_Contact_threshold) && !right_support_id && !double_support_id)
+        if (forceR(2)>NaoRobot.getWalkParameter(Early_Contact_threshold) && !right_support_id && !double_support_id)
         {
             rightEarlyContact=true;
         }
   
-        if (forceLw(2)>NaoRobot.getWalkParameter(Early_Contact_threshold) && right_support_id && !double_support_id)
+        if (forceL(2)>NaoRobot.getWalkParameter(Early_Contact_threshold) && right_support_id && !double_support_id)
         {
             leftEarlyContact=true;
         }
   
         
-        if (forceRw(2)< 2.0* NaoRobot.getWalkParameter(Ground_Contact_threshold) && double_support_id)
+        if (forceR(2)< 2.0* NaoRobot.getWalkParameter(Ground_Contact_threshold) && double_support_id)
         {
             rightLateContact=true;
         }
         
-        if (forceLw(2)< 2.0 * NaoRobot.getWalkParameter(Ground_Contact_threshold) && double_support_id)
+        if (forceL(2)< 2.0 * NaoRobot.getWalkParameter(Ground_Contact_threshold) && double_support_id)
         {
             leftLateContact=true;
         }
@@ -955,9 +947,7 @@ std::vector<float> WalkEngine::Calculate_IK()
     /** ------------------------------------------------------------------------ **/
     
     //desired=KVecDouble3(NaoLIPM.comx_d,NaoLIPM.comy_d,NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
-    desired=KVecDouble3(CoM_c(0),CoM_c(1),CoM_c(2)).scalar_mult(1000);
-
-    
+    desired=KVecDouble3(CoM_c(0),CoM_c(1),NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
 
      
     /** Targets for leg feet Transformations **/
@@ -965,8 +955,8 @@ std::vector<float> WalkEngine::Calculate_IK()
     Tir=getTransformation(NaoFeetEngine.getFootXYTheta(RightFoot), NaoFeetEngine.getFootZ(RightFoot));
     /** ------------------------------------------------------------------------ **/
     /** ------------------------------------------------------------------------ **/
-    //Til_eig = transformKMatToEigen(Til);
-    //Tir_eig = transformKMatToEigen(Tir);
+    Til_eig = transformKMatToEigen(Til);
+    Tir_eig = transformKMatToEigen(Tir);
 
     if(startup==0)
         CoMs=Tip.transform(nkin.calculateCenterOfMass());
@@ -1010,23 +1000,36 @@ std::vector<float> WalkEngine::Calculate_IK()
             ret[0]=ret[6];
         }
         else
+        {
+            std::cout<<"Failed step at target swing: "<<ci.targetSupport<<" and ZMP"<<ci.targetZMP<<std::endl;
+            std::cout<<"Target Step Location: "<<std::endl;
+            ci.target.prettyPrint();
+            std::cout<<"CoM location"<<std::endl;
+            desired.prettyPrint();
             std::cerr << "Right Leg EMPTY VECTOR " << std::endl;
+        }
     }
     else
+    {   
+        std::cout<<"Failed step at target swing: "<<ci.targetSupport<<" and ZMP"<<ci.targetZMP<<std::endl;
+        std::cout<<"Target Step Location: "<<std::endl;
+        ci.target.prettyPrint();
+        std::cout<<"CoM location"<<std::endl;
+        desired.prettyPrint();
         std::cerr << "Left Leg EMPTY VECTOR " << std::endl;
-
+    }
+    
     /** Ankle Correction with PID Control **/
-        // NaoPosture.torsoStabilizer(Angle(0), Angle(1), 0.0, 0.0, ret[2], ret[8], ret[1], ret[7]);
-        // ret[2]=NaoPosture.lhip_Pitch;
-        // ret[8]=NaoPosture.rhip_Pitch;
-        // ret[1]=NaoPosture.lhip_Roll;
-        // ret[7]=NaoPosture.rhip_Roll;
-
     /*
+        NaoPosture.torsoStabilizer(Angle(0), Angle(1), 0.0, 0.0, ret[2], ret[8], ret[1], ret[7]);
+        ret[2]=NaoPosture.lhip_Pitch;
+        ret[8]=NaoPosture.rhip_Pitch;
+        ret[1]=NaoPosture.lhip_Roll;
+        ret[7]=NaoPosture.rhip_Roll;
     if(GroundContact)
     {
 
-        zmpDist.computeDistribution(Vector3f(NaoMPCDCM.vrpx_d,NaoMPCDCM.vrpy_d,0.0), Vector3f(copi(0),copi(1),0.0),  forceLw,  forceRw,
+        zmpDist.computeDistribution(Vector3f(NaoLIPM.vrpx_d,NaoLIPM.vrpy_d,0.0), Vector3f(NaoLIPM.zmpx,NaoLIPM.zmpy,0.0),  forceLw,  forceRw,
                                  Vector3f(nipmEKF->fX,nipmEKF->fY,nipmEKF->fZ), Til_eig.translation(),  Tir_eig.translation(), Til_eig, Tir_eig,  right_support_id,  double_support_id);
 
         NaoPosture.ankleStabilizer(zmpDist.tauld, zmpDist.taurd, zmpDist.taul, zmpDist.taur,
@@ -1076,12 +1079,12 @@ std::vector<float> WalkEngine::Calculate_IK()
     armt.scalar_mult(1.0);
     //armt.prettyPrint();
     armangles_temp(2)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
-    armangles_temp(1)=asin((armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.25));
+    armangles_temp(1)=asin((armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0));
     armt=Tpprimer.getTranslation();
     armt.scalar_mult(1.0);
     //armt.prettyPrint();
     armangles_temp(0)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
-    armangles_temp(3)=asin((-armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.25) );
+    armangles_temp(3)=asin((-armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0) );
     //armangles.prettyPrint();
 
     if(startup==0)

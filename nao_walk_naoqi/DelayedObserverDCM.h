@@ -4,12 +4,13 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include "RobotParameters.h"
+#include <queue>
 
+#define ZMPDELAY 3
 using namespace Eigen;
 using namespace std;
 
 typedef Matrix<float,4,1> Matrix4_1f;
-typedef Matrix<float,4,3> Matrix4_3f;
 typedef Matrix<float,4,2> Matrix4_2f;
 typedef Matrix<float,1,4> Matrix1_4f;
 class DelayedObserverDCM
@@ -18,10 +19,11 @@ class DelayedObserverDCM
 private:
     RobotParameters &NaoRobot;
     Matrix4f  A, I;
-    Matrix1_4f Ccom, Czmp, Cdcm;
-    Matrix4_1f B;
-    Matrix4_2f Lcom;
-    Matrix4_3f L;
+    Matrix1_4f Ccom, Czmp;
+    Matrix4_1f B, Lcom;
+    Matrix4_2f L;
+    //std::queue<KVecFloat4> xbuffer;
+    std::queue<VectorXf> xbuffer;
 
     Vector4f x;
     void updateVars();
@@ -32,11 +34,9 @@ public:
      *  @brief filters the ZMP measurement from the CoP using
      *  also the COM measured by the encoders
      */
-    float Observer_COP, Observer_CoM, Observer_DCM;
-
     bool firstrun;
     void setInitialState(Vector4f x_);
-    void update(float u_, float zmp_, float dcm_, float com_);
+    void update(float u_, float com_, float zmp_);
     DelayedObserverDCM(RobotParameters &robot);
     float com, vrp, dcm, dist;
     Vector4f getState();

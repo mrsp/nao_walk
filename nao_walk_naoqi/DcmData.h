@@ -47,7 +47,7 @@ enum BEHAVIOURS
 // #define STEPS 1
 
 #define STAND 1
-#define WALK 0
+#define WALK 2
 
 #define CMD_FINISHED -1
 #define CMD_ERR -2

@@ -24,7 +24,7 @@ public:
     /** Walking Instruction to be executed **/
     
     std::queue<WalkInstruction> walkInstructionbuffer;
-    KVecFloat3 target, start, startL, startR, targetR, targetL, plantargetL, plantargetR, plantarget, planstartL, planstartR, stepr_a, stepr_b, stepl_a, stepl_b;
+    KVecFloat3 target, start, startL, startR, targetR, targetL, plantargetL, plantargetR, plantarget, planstartL, planstartR;
     /** ZMP Buffer for the Prediction Horizon **/
     boost::circular_buffer<KVecFloat3> ZMPbuffer;
     /** Queues needed for planning **/
@@ -34,10 +34,10 @@ public:
     //Methods
     void planZMPTrajectory();
     void computeSwingLegAndZMP(KVecFloat3 &tl, KVecFloat3 &tr, KVecFloat3 &t, KVecFloat3 sl,  KVecFloat3 sr, WalkInstruction i);
-    void generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_, float comZ_, float roll_, float pitch_, bool UseStepAdjustment, bool postureInitialized);
+    void generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_,bool UseStepAdjustment);
     void init(KVecFloat3 sl, KVecFloat3 sr);
     void emptyPlan();
-    void plan(KVecFloat2 DCM_,KVecFloat2 COP_, float comZ_, float roll_, float pitch_, bool UseStepAdjustment,  bool postureInitialized);
+    void plan(KVecFloat2 DCM_,KVecFloat2 COP_,bool UseStepAdjustment);
     TrajectoryPlanner(RobotParameters &robot);
     //Step Adjustment
     StepAdjustment sa;
@@ -59,7 +59,7 @@ public:
     }
     float cropStep(float f_, float max_, float min_)
     {
-        return max(min_, min(f_, max_));
+        return fmax(min_, fmin(f_, max_));
     }
 };
 #endif

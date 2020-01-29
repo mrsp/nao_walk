@@ -10,7 +10,7 @@
 #include"Logs.h"
 
 
-const float standingStiffness=0.9f;
+const float standingStiffness=0.75f;
 // const float LOOP_TIME = 200000.0f;
 // const float LOOP_TIME = 10000;
 const float LOOP_TIME = 5000;
@@ -363,16 +363,16 @@ void LowLevelPlanner::start()
     /**
      Set Body Stiffness
      **/
-    motion->setStiffnesses("Body",standingStiffness/2.0);
+    motion->setStiffnesses("Body",0.75f);
     motion->setFallManagerEnabled(false);
     motion->wakeUp();
-    posture->goToPosture("StandInit",standingStiffness/2.0);
+    posture->goToPosture("StandInit", 0.35f );
     sleep(0.5);
     
     std::cout<<"Now Initializing DCM Connection "<<std::endl;
     //connectToDCMloop();
-    setStiffness(standingStiffness);
-    motion->setStiffnesses("Body",standingStiffness);
+    setStiffness(0.90f);
+    motion->setStiffnesses("Body",0.75f);
     dcm_state = DCM_RUNNING;
     
     firstIncomingStep = true;
@@ -1233,6 +1233,7 @@ void LowLevelPlanner::stepsCallback(const command_t &cmd)
     step_t *steps=(step_t*)cmd.data;    
     int step_size=cmd.data_size/sizeof(step_t);    
     LOG_DBG("Received %d steps.",step_size);
+    std::cout<<"New steps received"<<std::endl;
     for(int j=0;j<step_size;j++)
     {        
         /** Initial Walking Instruction **/
@@ -1248,13 +1249,13 @@ void LowLevelPlanner::stepsCallback(const command_t &cmd)
         i.target(1) = steps[j].y;
         i.target(2) = steps[j].theta;
         /** ZMP in the Middle of Convex Hull **/
-        if( steps[j].cmd==STAND)
+        if(steps[j].cmd==STAND)
             i.targetZMP=KDeviceLists::SUPPORT_LEG_BOTH;
         else
             i.targetZMP=i.targetSupport;
         i.steps=NaoRobot.getWalkParameter(SS_instructions);
         
-        std::cout<<"step "<<i.target(0)<<" "<<i.target(1)<<" "<<i.target(2)<<" "<<i.targetSupport<<" "<<i.targetZMP<<endl;
+        std::cout<<"step "<<i.target(0)<<" "<<i.target(1)<<" "<<i.target(2)<<" "<<i.targetSupport<<std::endl;
         engine->addWalkInstruction(i);
 
         if(j==0)
@@ -1351,20 +1352,13 @@ void LowLevelPlanner::setRobotConfig(float *value)
         engine->NaoLIPM.Observer_CoMX = value[2];
         engine->NaoLIPM.Observer_CoMY = value[3];
         
-        engine->NaoMPCDCM.dObsDCMx.Observer_COP = value[0];
-        engine->NaoMPCDCM.dObsDCMy.Observer_COP = value[1];
-        engine->NaoMPCDCM.dObsDCMx.Observer_CoM = value[2];
-        engine->NaoMPCDCM.dObsDCMy.Observer_CoM = value[3];
-
-
-
-        engine->NaoPosture.Kcx_ = value[4];
-        engine->NaoPosture.Tcx_ = value[5];
-        engine->NaoPosture.Kcy_ = value[6];
-        engine->NaoPosture.Tcy_ = value[7];
-
-        engine->NaoMPCDCM.dObsDCMx.Observer_DCM = value[8];
-        engine->NaoMPCDCM.dObsDCMy.Observer_DCM = value[9];
+        // engine->NaoPosture.Kp_PitchT = value[4];
+        // engine->NaoPosture.Kd_PitchT = value[5];
+        // engine->NaoPosture.Kp_RollT = value[6];
+        // engine->NaoPosture.Kd_RollT = value[7];
+        engine->NaoPosture.amX = value[8];
+        engine->NaoPosture.amY = value[9];
+        //engine->NaoFeetEngine.StepZ_ = value[10];
         engine->NaoVRPToCoM.gain_x = value[11];
         engine->NaoVRPToCoM.gain_y = value[12];
         std::cout<<"Config change"<<std::endl;

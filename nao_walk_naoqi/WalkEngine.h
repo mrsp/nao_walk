@@ -24,6 +24,7 @@
 #include "ZMPDistributor.h"
 #include "Stepplanner2D.h"
 #include "LIPMThread.h"
+#include "ZMPFilter.h"
 #include<list>
 using namespace Eigen;
 
@@ -51,7 +52,7 @@ public:
     RobotParameters &NaoRobot;
     
     KWalkMat interp;
-    
+    ZMPFilter zmpFilter;
     FeetEngine NaoFeetEngine;
     
     NAOKinematics nkin;
@@ -206,7 +207,7 @@ private:
     
     float support_foot_, double_support_; //1 for left 0 for right;
     Vector3f copsrel, fis;
-    Vector3d CoM_c;
+    Vector2d CoM_c;
     
     
     /** The Inverse Kinematics Targets **/

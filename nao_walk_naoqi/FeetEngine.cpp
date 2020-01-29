@@ -212,16 +212,16 @@ void FeetEngine::MotionPlan(KVecFloat3 target, unsigned step, unsigned totalstep
             //if (ci.state==KICK)
             //dr(0)=planForwardKick( (float)currentstep, ci.target(0), startR(0), ci.steps-1);
             //else
-            FootR(0)=interp.LinearInterpolation((float) step, target(0), startR(0), totalsteps-1.0);
+            FootR(0)=interp.planFeetTrajectoryXY((float) step, target(0), startR(0), totalsteps-1.0);
 
-            FootR(1)=interp.LinearInterpolation((float) step, target(1), startR(1), totalsteps-1.0);
+            FootR(1)=interp.planFeetTrajectoryXY((float) step, target(1), startR(1), totalsteps-1.0);
 
 
             FootR(2)=startR(2)+interp.LinearInterpolation((float) step, diff, 0.0, totalsteps-1.0);
 
             // if(!RightLateContact)
             // {
-                FootRz=interp.CubicSplineInterpolation( (float) step, 0.000, StepZ_/2.0, StepZ_, StepZ_/4.0,0.000,totalsteps-1.0);
+                FootRz=interp.CubicSplineInterpolation( (float) step, 0.000, StepZ_/2.0, 1.25*StepZ_, StepZ_/3.0,0.000,totalsteps-1.0);
                 //FootRz=interp.planFeetTrajectoryZ((float) step, NaoRobot.getWalkParameter(StepZ),0.000, totalsteps);
                // FootRz=interp.BezierZ((float) step, NaoRobot.getWalkParameter(StepZ), totalsteps-1.0);
             // }
@@ -241,15 +241,15 @@ void FeetEngine::MotionPlan(KVecFloat3 target, unsigned step, unsigned totalstep
             /** Left Foot Interpolation **/
             float diff=KMath::anglediff2(target(2),startL(2));
             
-            FootL(0)=interp.LinearInterpolation((float) step, target(0), startL(0), totalsteps-1.0);
+            FootL(0)=interp.planFeetTrajectoryXY((float) step, target(0), startL(0), totalsteps-1.0);
 
-            FootL(1)=interp.LinearInterpolation((float) step, target(1), startL(1), totalsteps-1.0);
+            FootL(1)=interp.planFeetTrajectoryXY((float) step, target(1), startL(1), totalsteps-1.0);
 
             FootL(2)=startL(2)+interp.LinearInterpolation( (float) step, diff, 0.0, totalsteps-1.0);
 
             // if(!LeftLateContact)
             // {
-                FootLz=interp.CubicSplineInterpolation((float) step, 0.000, StepZ_/2.0, StepZ_, StepZ_/4.0,0.000,totalsteps-1.0);
+                FootLz=interp.CubicSplineInterpolation((float) step, 0.000, StepZ_/2.0, StepZ_, StepZ_/3.0,0.000,totalsteps-1.0);
                // FootLz=interp.planFeetTrajectoryZ((float) step, NaoRobot.getWalkParameter(StepZ),0.000, totalsteps);
                 // FootLz=interp.BezierZ((float) step, NaoRobot.getWalkParameter(StepZ), totalsteps-1.0);
 

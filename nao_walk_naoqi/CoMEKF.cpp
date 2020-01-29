@@ -353,7 +353,7 @@ void CoMEKF::updateVars()
     ZMP(0)= COP(0);
     ZMP(1)= COP(1);
     
-	float w = sqrt(g/l);
+	float w = sqrt(g/(comZ-COP(2)));
 
 
 

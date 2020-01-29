@@ -353,9 +353,9 @@ void nao_walk_ros::footstepsExecutionCallback(FootstepsGoalH gh)
         steps[i].y=goal->footsteps[i].pose.y;
         steps[i].theta=goal->footsteps[i].pose.theta;
         
-        if(i==goal->footsteps.size()-1)
-             steps[i].cmd = STAND;
-        else
+        //if(i==goal->footsteps.size()-1)
+        //     steps[i].cmd = STAND;
+        //else
             steps[i].cmd = WALK;
     }
     command_t cmd;

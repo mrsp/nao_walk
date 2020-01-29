@@ -12,20 +12,17 @@ StepAdjustment::StepAdjustment(RobotParameters &robot_):robot(robot_)
     tau_max = exp(w*T_max);
     tau_nom = exp(w*T_nom);
 
-    kx = 0.5;
-    ky = 0.05;
-
     rot.zero();
     L_max.zero();
     L_min.zero();
     lp = (double) 2.0*robot.getWalkParameter(H0);
  
     //Set weights
-    a_0 = 10.0; //10
-    a_1 = 10.0; //10
-    a_2 = 1.0;
-    a_3 = 10.0; //1
-    a_4 = 10.0; //1
+    a_0 = 1.0;
+    a_1 = 1.0;
+    a_2 = 0.1;
+    a_3 = 100.0;
+    a_4 = 100.0;
 
     n = 5;
     G.resize(n, n);
@@ -188,14 +185,12 @@ void StepAdjustment::solve(double ksix_0,  double ksiy_0, double copx_0, double 
 
 
     //Equality constraints
-    CE[2][0] = -(ksix_0-copx_0)/2;
-    CE[2][1] = -(ksiy_0-copy_0)/2;
+    CE[2][0] = -(ksix_0-copx_0);
+    CE[2][1] = -(ksiy_0-copy_0);
 
-    // ce0[0] = -copx_0;
-    // ce0[1] = -copy_0;
+    ce0[0] = -copx_0;
+    ce0[1] = -copy_0;
 
-    ce0[0] = -vrpx_0;
-    ce0[1] = -vrpy_0;
 
     //Inequality Constraints
     a_11 = rot_T(0,0);
@@ -250,30 +245,15 @@ void StepAdjustment::solve(double ksix_0,  double ksiy_0, double copx_0, double 
       step_bx = x[3];
       step_by = x[4];
     }
-      // cout<<"Ref Location"<<endl;
-      // cout<<vrpx_ref<<" "<<vrpy_ref<<endl;
-      // cout<<"Initial Location"<<endl;
-      // cout<<vrpx_0<<" "<<vrpy_0<<endl;
-      // cout<<"Step Location"<<endl;
-      // cout<<step_locationx<<" "<<step_locationy<<endl;
-      // cout<<"Step Instructions"<<endl;
-      // cout<<step_instructions<<endl;
-      // cout<<"Step bx "<<step_bx<<"Step bx nom "<<bx_nom<<endl;
-      // cout<<"Step by "<<step_by<<"Step by nom "<<by_nom<<endl;
-      // cout<<"DCM "<<ksix_0<<" "<<ksiy_0<<endl;
-}
-
-
-void StepAdjustment::solve(double roll, double pitch, double comZ, double vrpx_ref, double vrpy_ref)
-{
-
-  double dx = kx * comZ * sin(pitch);
-  double dy = -ky * comZ * sin(roll);
-
-  step_locationx = vrpx_ref + dx;
-  step_locationy = vrpy_ref + dy;
- 
-
-  step_instructions = (double) robot.getWalkParameter(SS_instructions);
-
+      cout<<"Ref Location"<<endl;
+      cout<<vrpx_ref<<" "<<vrpy_ref<<endl;
+      cout<<"Initial Location"<<endl;
+      cout<<vrpx_0<<" "<<vrpy_0<<endl;
+      cout<<"Step Location"<<endl;
+      cout<<step_locationx<<" "<<step_locationy<<endl;
+      cout<<"Step Instructions"<<endl;
+      cout<<step_instructions<<endl;
+      cout<<"Step bx "<<step_bx<<"Step bx nom "<<bx_nom<<endl;
+      cout<<"Step by "<<step_by<<"Step by nom "<<by_nom<<endl;
+      cout<<"DCM "<<ksix_0<<" "<<ksiy_0<<endl;
 }

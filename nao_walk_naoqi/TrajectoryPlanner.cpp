@@ -37,11 +37,6 @@ void TrajectoryPlanner::init(KVecFloat3 sl, KVecFloat3 sr){
     start(1) += rr(1);
     start.scalar_mult(0.5);
     start(2)=meanangle;
-
-    stepr_a = startR;
-    stepr_b = startR;
-    stepl_a = startR;
-    stepl_b = startR;
 }
 
 void TrajectoryPlanner::setInitialFeet(KVecFloat3 sl, KVecFloat3 sr)
@@ -50,8 +45,7 @@ void TrajectoryPlanner::setInitialFeet(KVecFloat3 sl, KVecFloat3 sr)
     startR = sr;
 }
 
-void TrajectoryPlanner::generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_, float comZ_, float roll_, float  pitch_, bool UseStepAdjustment, bool postureInitialized)
-{
+void TrajectoryPlanner::generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_, bool UseStepAdjustment){
 
 
 
@@ -94,80 +88,114 @@ void TrajectoryPlanner::generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_, float com
             if(i.phase == single_support)
             {
 
-                if(i.targetZMP == KDeviceLists::SUPPORT_LEG_RIGHT)
+                
+                if(i.targetSupport == KDeviceLists::SUPPORT_LEG_RIGHT)
                 {
           
-                    stepr_b = i.target;
-
-
                     //Check for Kinematic Bounds on steps
                     //Crop X axis
                     SFoot_rot.zero();
                     SFoot_angle = startR(2);
-                    KMath::KMat::transformations::makeRotation(SFoot_rot, SFoot_angle);
 
-                // cout<<" Step after crop "<<endl;
-                // i.target.prettyPrint();
-                // cout<<"----- "<<endl;
-                    if(UseStepAdjustment && postureInitialized)
+                    std::cout<<"--------------------------"<<std::endl;
+                    std::cout<<" START RIGHT LEG POSE "<<std::endl;
+                    startR.prettyPrint();
+                    std::cout<<" TARGET LEFT LEG POSE "<<std::endl;
+                    i.target.prettyPrint();
+
+                    KMath::KMat::transformations::makeRotation(SFoot_rot, SFoot_angle);
+                    SFoot_rot.prettyPrint();
+
+                    dx =   KVecFloat2(i.target(0)-startR(0),i.target(1)-startR(1));
+                    tempV = SFoot_rot.transp() * dx;
+                    std::cout<<"after transp() "<<std::endl;
+                    SFoot_rot.prettyPrint();
+                    std::cout<<"TEMP ROTATED DIST "<<std::endl;
+                    tempV.prettyPrint();
+
+
+
+                    tempV(0) = cropStep(tempV(0),NaoRobot.getWalkParameter(MaxStepX),NaoRobot.getWalkParameter(MinStepX));
+                    tempV(1) = cropStep(tempV(1),NaoRobot.getWalkParameter(MaxStepY),NaoRobot.getWalkParameter(MinStepY));
+                    std::cout<<"TEMP ROTATED AFTER CROP"<<std::endl;
+                    tempV.prettyPrint();
+                    tempV = SFoot_rot * tempV;
+                    i.target(0)= startR(0) + tempV(0);
+                    i.target(1)= startR(1) + tempV(1); 
+                    std::cout<<"TARGET LEFT LEG POSE CROPPED "<<std::endl;
+                    i.target.prettyPrint();
+                    std::cout<<"--------------------------"<<std::endl;
+                    if(UseStepAdjustment)
                     {
-                     
-                       // sa.solve((double) DCM_(0), (double) DCM_(1), (double) COP_(0),  (double) COP_(1), (double) startR(0), (double) startR(1),
-                       // (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 1);
-                        sa.solve((double) roll_, (double)  pitch_, (double)  comZ_, (double) i.target(0), (double) i.target(1));
+                        //sa.solve((double) DCM_(0), (double) DCM_(1), (double) startR(0),
+                        // (double) startR(1), (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 1);
+                        sa.solve((double) DCM_(0), (double) DCM_(1), (double) COP_(0),  (double) COP_(1), (double) startR(0), (double) startR(1),
+                        (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 1);
                         i.target(0)= sa.step_locationx;
                         i.target(1)= sa.step_locationy;
                         i.steps = (unsigned int) sa.step_instructions;
+                        // dx =  KVecFloat2(i.target(0)-startR(0),i.target(1)-startR(1));
                     }
-                    if(postureInitialized)
-                    {
-                        dx =   KVecFloat2(i.target(0)-startR(0),i.target(1)-startR(1));
-                        tempV = SFoot_rot.transp() * dx;
-                        tempV(0) = cropStep(tempV(0),NaoRobot.getWalkParameter(MaxStepX),NaoRobot.getWalkParameter(MinStepX));
-                        tempV(1) = cropStep(tempV(1),NaoRobot.getWalkParameter(MaxStepY),NaoRobot.getWalkParameter(MinStepY));
-                        tempV = SFoot_rot * tempV;
-                        i.target(0)= startR(0) + tempV(0);
-                        i.target(1)= startR(1) + tempV(1); 
-                    }
-                    stepr_a = i.target;
-                }
-                else if(i.targetZMP==KDeviceLists::SUPPORT_LEG_LEFT)
-                {
-                    stepl_b = i.target;
 
+
+                }
+                else if(i.targetSupport==KDeviceLists::SUPPORT_LEG_LEFT)
+                {
                    
                     // Check for Kinematic Bounds on steps
                     //Crop X axis
+                    std::cout<<"--------------------------"<<std::endl;
+                    std::cout<<" START LEFT LEG POSE "<<std::endl;
+                    startL.prettyPrint();
+                    std::cout<<" TARGET RIGHT LEG POSE "<<std::endl;
+                    i.target.prettyPrint();
+
                     SFoot_rot.zero();
                     SFoot_angle = startL(2);
                     KMath::KMat::transformations::makeRotation(SFoot_rot, SFoot_angle);
+                    SFoot_rot.prettyPrint();
 
-                    if(UseStepAdjustment && postureInitialized)
+                    dx =  KVecFloat2(i.target(0)-startL(0),i.target(1)-startL(1));
+
+                
+                    tempV = SFoot_rot.transp() * dx;
+                    
+                    std::cout<<"after transp() "<<std::endl;
+                    SFoot_rot.prettyPrint();
+                    std::cout<<"TEMP ROTATED DIST "<<std::endl;
+                    tempV.prettyPrint();
+
+                    tempV(0) = cropStep(tempV(0),NaoRobot.getWalkParameter(MaxStepX),NaoRobot.getWalkParameter(MinStepX));
+                    tempV(1) = cropStep(tempV(1),-NaoRobot.getWalkParameter(MinStepY),-NaoRobot.getWalkParameter(MaxStepY));
+                    std::cout<<"TEMP ROTATED AFTER CROP"<<std::endl;
+                    tempV.prettyPrint();
+                    tempV = SFoot_rot * tempV;
+
+
+                    i.target(0)= startL(0) + tempV(0);
+                    i.target(1)= startL(1) + tempV(1); 
+
+                    std::cout<<"TARGET RIGHT LEG POSE CROPPED "<<std::endl;
+                    i.target.prettyPrint();
+                    std::cout<<"--------------------------"<<std::endl;
+                    if(UseStepAdjustment)
                     {
-                        //sa.solve((double) DCM_(0), (double) DCM_(1), 
-                        //    (double) COP_(0),  (double) COP_(1), (double) startL(0), (double) startL(1), (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 0);
-                        sa.solve((double) roll_, (double)  pitch_, (double)  comZ_, (double) i.target(0), (double) i.target(1));
 
+
+                        //sa.solve((double) DCM_(0), (double) DCM_(1), 
+                        //(double) startL(0), (double) startL(1), (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 0);
+                        sa.solve((double) DCM_(0), (double) DCM_(1), 
+                            (double) COP_(0),  (double) COP_(1), (double) startL(0), (double) startL(1), (double) i.target(0), (double) i.target(1), (double) SFoot_angle, 0);
+                        
                         i.target(0)= sa.step_locationx;
                         i.target(1)= sa.step_locationy;
                         i.steps = (unsigned int) sa.step_instructions;
+                        //dx =  KVecFloat2(i.target(0)-startL(0),i.target(1)-startL(1));
                     }
-                    if(postureInitialized)
-                    {
-                        dx =  KVecFloat2(i.target(0)-startL(0),i.target(1)-startL(1));
-                        tempV = SFoot_rot.transp() * dx;
-                        tempV(0) = cropStep(tempV(0),NaoRobot.getWalkParameter(MaxStepX),NaoRobot.getWalkParameter(MinStepX));
-                        tempV(1) = cropStep(tempV(1),-NaoRobot.getWalkParameter(MinStepY),-NaoRobot.getWalkParameter(MaxStepY));
-                        tempV = SFoot_rot * tempV;
-                        
-                        i.target(0)= startL(0) + tempV(0);
-                        i.target(1)= startL(1) + tempV(1); 
-                    }
-                    stepl_a = i.target;
-
-                }
 
            
+                }
+            
                 ci = i;
 
             }
@@ -202,8 +230,8 @@ void TrajectoryPlanner::generatePlan(KVecFloat2 DCM_, KVecFloat2 COP_, float com
 
 
 
-void TrajectoryPlanner::plan(KVecFloat2 DCM_,KVecFloat2 COP_, float comZ_, float  roll_, float pitch_,bool UseStepAdjustment, bool postureInitialized){
-    generatePlan(DCM_,COP_,comZ_, roll_, pitch_, UseStepAdjustment,postureInitialized);
+void TrajectoryPlanner::plan(KVecFloat2 DCM_,KVecFloat2 COP_,bool UseStepAdjustment){
+    generatePlan(DCM_,COP_,UseStepAdjustment);
     planZMPTrajectory();
     planAvailable = true;
 }
@@ -225,8 +253,8 @@ void TrajectoryPlanner::planZMPTrajectory(){
                 /** Angle between the ending and starting foot orientation **/
                 float adiff = KMath::anglediff2(target(2),start(2));
                 /** ZMP Trajectory Generation **/
-                ZMPref(0)=interp.LinearInterpolation((float) p, target(0), start(0), i.steps-1.0);
-                ZMPref(1)=interp.LinearInterpolation((float) p, target(1), start(1), i.steps-1.0);
+                ZMPref(0)=interp.planFeetTrajectoryXY((float) p, target(0), start(0), i.steps-1.0);
+                ZMPref(1)=interp.planFeetTrajectoryXY((float) p, target(1), start(1), i.steps-1.0);
                 ZMPref(2)=start(2)+interp.LinearInterpolation( (float) p, adiff, 0.000,i.steps-1.0);
                 /** ZMP Point pushed to ZMP buffer **/
                 ZMPbuffer.push_back(ZMPref);
@@ -243,8 +271,8 @@ void TrajectoryPlanner::planZMPTrajectory(){
                 /** Angle between the ending and starting foot orientation **/
                 float adiff = KMath::anglediff2(ZMPrefT(2),ZMPref0(2));
                 /** ZMP Trajectory Generation **/
-                ZMPref(0)=interp.LinearInterpolation((float) p, ZMPrefT(0), ZMPref0(0), i.steps-1.0);
-                ZMPref(1)=interp.LinearInterpolation((float) p, ZMPrefT(1), ZMPref0(1), i.steps-1.0);
+                ZMPref(0)=interp.planFeetTrajectoryXY((float) p, ZMPrefT(0), ZMPref0(0), i.steps-1.0);
+                ZMPref(1)=interp.planFeetTrajectoryXY((float) p, ZMPrefT(1), ZMPref0(1), i.steps-1.0);
                 ZMPref(2)=ZMPref0(2)+interp.LinearInterpolation( (float) p, adiff, 0.000,i.steps-1.0);
                 /** ZMP Point pushed to ZMP buffer **/
                 ZMPbuffer.push_back(ZMPref);
