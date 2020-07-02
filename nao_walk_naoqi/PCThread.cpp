@@ -149,10 +149,14 @@ PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), Dynamic
     dcmy_d = 0;
     std::cout<<"Online Pattern Planner with Preview Controller Initialized Successfully"<<std::endl;
     firstrun = true;
-    Observer_CoMX = 0.4;
-	Observer_CoMY = 0.8;
-	Observer_COPX = 0.35;
-	Observer_COPY = 0.55;
+    Observer_CoMX = 0.1;
+	Observer_CoMY = 0.2;
+	Observer_COPX = 0.3;
+	Observer_COPY = 0.6;
+    KalmanX.COP_Noise=0.05;
+    KalmanY.COP_Noise=0.1;
+    KalmanX.CoM_Noise=0.005;
+    KalmanY.CoM_Noise=0.01;
 }
 void PCThread::setInitialState( KVecFloat2 CoM, KVecFloat2 ZMP)
 {
@@ -378,8 +382,8 @@ Kalman::Kalman(RobotParameters &robot):OurRobot(robot)
     P(0,0)=1e-10;
     MeasurementNoise.identity();
     
-    CoM_Noise = 0.001;
-    COP_Noise = 0.01;
+    CoM_Noise = 0.005;
+    COP_Noise = 0.05;
     MeasurementNoise(0,0) = CoM_Noise;
     MeasurementNoise(1,1) = COP_Noise;
     Ckalman.zero();

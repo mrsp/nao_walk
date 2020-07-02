@@ -1351,16 +1351,16 @@ void LowLevelPlanner::setRobotConfig(float *value)
         engine->NaoLIPM.Observer_COPY = value[1];
         engine->NaoLIPM.Observer_CoMX = value[2];
         engine->NaoLIPM.Observer_CoMY = value[3];
-        
-        // engine->NaoPosture.Kp_PitchT = value[4];
-        // engine->NaoPosture.Kd_PitchT = value[5];
-        // engine->NaoPosture.Kp_RollT = value[6];
-        // engine->NaoPosture.Kd_RollT = value[7];
-        engine->NaoPosture.amX = value[8];
-        engine->NaoPosture.amY = value[9];
-        //engine->NaoFeetEngine.StepZ_ = value[10];
-        engine->NaoVRPToCoM.gain_x = value[11];
-        engine->NaoVRPToCoM.gain_y = value[12];
+        engine->NaoLIPM.KalmanX.COP_Noise = value[4];
+        engine->NaoLIPM.KalmanY.COP_Noise = value[5];
+        engine->NaoLIPM.KalmanX.CoM_Noise = value[6];
+        engine->NaoLIPM.KalmanY.CoM_Noise = value[7];
+        // engine->NaoPosture.Kp_PitchT = value[8];
+        // engine->NaoPosture.Kd_PitchT = value[9];
+        // engine->NaoPosture.Kp_RollT = value[10];
+        // engine->NaoPosture.Kd_RollT = value[11];
+        engine->NaoVRPToCoM.gain_x = value[12];
+        engine->NaoVRPToCoM.gain_y = value[13];
         std::cout<<"Config change"<<std::endl;
     }
 }

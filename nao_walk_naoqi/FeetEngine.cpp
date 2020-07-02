@@ -249,7 +249,7 @@ void FeetEngine::MotionPlan(KVecFloat3 target, unsigned step, unsigned totalstep
 
             // if(!LeftLateContact)
             // {
-                FootLz=interp.CubicSplineInterpolation((float) step, 0.000, StepZ_/2.0, StepZ_, StepZ_/3.0,0.000,totalsteps-1.0);
+                FootLz=interp.CubicSplineInterpolation((float) step, 0.000, StepZ_/2.0, 1.25*StepZ_, StepZ_/3.0,0.000,totalsteps-1.0);
                // FootLz=interp.planFeetTrajectoryZ((float) step, NaoRobot.getWalkParameter(StepZ),0.000, totalsteps);
                 // FootLz=interp.BezierZ((float) step, NaoRobot.getWalkParameter(StepZ), totalsteps-1.0);
 

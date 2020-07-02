@@ -376,25 +376,26 @@ void nao_walk_ros::reconfigureCB(nao_walk::GaitControlConfig& config, uint32_t l
     cmd.data=(void*)malloc(cmd.data_size);
     
     float *data=(float*)cmd.data;
-    data[0] = config.COP_Noise;
-    data[1] = config.CoM_Noise;
-    data[2] = config.Observer_COP;
-    data[3] = config.Observer_CoM;
-    data[4] = config.Kp_Pitch;
-    data[5] = config.Kd_Pitch;
-    data[6] = config.Kp_Roll;
-    data[7] = config.Kd_Roll;
-    data[8] = config.amX;
-    data[9] = config.amY;
-    data[10] = config.StepHeight;
-    data[11] = config.kfx;
-    data[12] = config.kfy;
-    data[13] = config.kcx;
-    data[14] = config.kcy;
+    data[0] = config.Observer_COPX;
+    data[1] = config.Observer_COPY;
+    data[2] = config.Observer_CoMX;
+    data[3] = config.Observer_CoMY;
+    data[4] = config.COP_NoiseX;
+    data[5] = config.COP_NoiseY;
+    data[6] = config.CoM_NoiseX;
+    data[7] = config.CoM_NoiseY;
+    data[8] = config.Kp_PitchT;
+    data[9] = config.Kd_PitchT;
+    data[10] = config.Kp_RollT;
+    data[11] = config.Kd_RollT;
+    data[12] = config.kfx;
+    data[13] = config.kfy;
+    data[14] = config.StepHeight;
+
     addCmd(cmd);
         ROS_INFO("Reconfigure Request: %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f", 
-            config.COP_Noise,config.CoM_Noise,config.Observer_COP,config.Observer_CoM,
-            config.Kp_Pitch, config.Kd_Pitch,config.Kp_Roll,config.Kd_Roll,config.amX,config.amY,config.StepHeight,config.kfx,config.kfy,config.kcx,config.kcy);
+            config.Observer_COPX, config.Observer_COPY, config.Observer_CoMX,config.Observer_CoMY, config.COP_NoiseX, config.COP_NoiseY, config.CoM_NoiseX, config.CoM_NoiseY,
+            config.Kp_PitchT, config.Kd_PitchT, config.Kp_RollT, config.Kd_RollT,  config.kfx,  config.kfy, config.StepHeight);
     /*
     if(proxy_ready_)
     {

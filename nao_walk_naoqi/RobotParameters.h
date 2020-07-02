@@ -104,7 +104,7 @@ public:
         WalkParameters[Tss_min] = 0.28;
         WalkParameters[Tss_max] = 0.35;
         WalkParameters[StepPlanAdjustment] = false;
-        WalkParameters[velocityControl] = false;
+        WalkParameters[velocityControl] = true;
         WalkParameters[alpha_ZMPFilter] = 0.35;
     }
     
