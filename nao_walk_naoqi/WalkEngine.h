@@ -23,7 +23,7 @@
 #include <eigen3/Eigen/Dense>
 #include "ZMPDistributor.h"
 #include "Stepplanner2D.h"
-#include "LIPMThread.h"
+//#include "LIPMThread.h"
 #include "ZMPFilter.h"
 #include<list>
 using namespace Eigen;

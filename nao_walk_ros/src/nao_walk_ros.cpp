@@ -179,7 +179,8 @@ int nao_walk_ros::readData(dcm_data_t &data)
     copl_pub.publish(copl_msg);
     copr_pub.publish(copr_msg);
     rfsr_pub.publish(rfsr_msg);
-    
+    joint_state_pub.publish(joint_state_msg);
+
     if(tf_from_kimenatics )
     {
 //         boost::shared_ptr<nav_msgs::Odometry> odom_msg(new  nav_msgs::Odometry); 
@@ -188,7 +189,6 @@ int nao_walk_ros::readData(dcm_data_t &data)
         publishOdomToTf(odom_msg); 
     }
     
-    joint_state_pub.publish(joint_state_msg);
     fsr_seq++;
     seq++;
         

@@ -371,8 +371,8 @@ void LowLevelPlanner::start()
     
     std::cout<<"Now Initializing DCM Connection "<<std::endl;
     //connectToDCMloop();
-    setStiffness(0.90f);
-    motion->setStiffnesses("Body",0.75f);
+    setStiffness(0.85f);
+    motion->setStiffnesses("Body",0.85f);
     dcm_state = DCM_RUNNING;
     
     firstIncomingStep = true;
@@ -1361,6 +1361,7 @@ void LowLevelPlanner::setRobotConfig(float *value)
         // engine->NaoPosture.Kd_RollT = value[11];
         engine->NaoVRPToCoM.gain_x = value[12];
         engine->NaoVRPToCoM.gain_y = value[13];
+        engine->NaoFeetEngine.StepZ_ = value[14];
         std::cout<<"Config change"<<std::endl;
     }
 }

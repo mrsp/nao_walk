@@ -4,9 +4,9 @@
 #include <nao_walk/GaitControlConfig.h>
 
 void callback(nao_walk::GaitControlConfig &config, uint32_t level) {
-      ROS_INFO("Reconfigure Request: %f %f %f %f %f %f %f %f %f %f", 
-            config.COP_Noise,config.CoM_Noise,config.Observer_COP,config.Observer_CoM,
-            config.Kp_Pitch, config.Kd_Pitch,config.Kp_Roll,config.Kd_Roll,config.amX,config.amY);
+      ROS_INFO("Reconfigure Request: %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f", 
+             config.Observer_COPX, config.Observer_COPY, config.Observer_CoMX,config.Observer_CoMY, config.COP_NoiseX, config.COP_NoiseY, config.CoM_NoiseX, config.CoM_NoiseY,
+            config.Kp_PitchT, config.Kd_PitchT, config.Kp_RollT, config.Kd_RollT,  config.kfx,  config.kfy, config.StepHeight);
 
 }
 

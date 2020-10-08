@@ -13,7 +13,7 @@ PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), Dynamic
     uY=0.000;
     /** Defining the Optimal Gains for the Preview Controller **/
     //Integral Feedback Gain
-
+    /*
    Gi=2.2069e+03;
     //State Feedback Gain
     Gx(0,0)=1.0e+04 * 7.3550 ;
@@ -121,10 +121,66 @@ PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), Dynamic
            Gd(98)= -0.0101;
            Gd(99)= -0.0095;
     Gd.scalar_mult(1.0e+03);
+    */
 
 
-
-
+    Gi=858.9552;
+    //State Feedback Gain
+    Gx(0,0)=1.0e+04 * 3.0043 ;
+    Gx(0,1)=1.0e+04 * 0.5404;
+    Gx(0,2)=1.0e+04 * 0.0090;
+    //Predicted Reference Gain
+    Gd(0)=-0.8590;
+    Gd(1)=-1.0544;
+    Gd(2)=-1.2600;
+    Gd(3)=-1.3975;
+    Gd(4)=-1.4522;
+    Gd(5)=-1.4390;
+    Gd(6)=-1.3819;
+    Gd(7)=-1.3027;
+    Gd(8)=-1.2168;
+    Gd(9)=-1.1332;
+    Gd(10)=-1.0562;
+    Gd(11)=-0.9867;
+    Gd(12)=-0.9241;
+    Gd(13)=-0.8674;
+    Gd(14)=-0.8153;
+    Gd(15)=-0.7670;
+    Gd(16)=-0.7217;
+    Gd(17)=-0.6791;
+    Gd(18)=-0.6390;
+    Gd(19)=-0.6011;
+    Gd(20)=-0.5654;
+    Gd(21)=-0.5317;
+    Gd(22)=-0.5000;
+    Gd(23)=-0.4702;
+    Gd(24)=-0.4422;
+    Gd(25)=-0.4158;
+    Gd(26)=-0.3910;
+    Gd(27)=-0.3677;
+    Gd(28)=-0.3458;
+    Gd(29)=-0.3252;
+    Gd(30)=-0.3059;
+    Gd(31)=-0.2876;
+    Gd(32)=-0.2705;
+    Gd(33)=-0.2544;
+    Gd(34)=-0.2392;
+    Gd(35)=-0.2250;
+    Gd(36)=-0.2116;
+    Gd(37)=-0.1990;
+    Gd(38)=-0.1871;
+    Gd(39)=-0.1760;
+    Gd(40)=-0.1655;
+    Gd(41)=-0.1556;
+    Gd(42)=-0.1463;
+    Gd(43)=-0.1376;
+    Gd(44)=-0.1294;
+    Gd(45)=-0.1217;
+    Gd(46)=-0.1145;
+    Gd(47)=-0.1076;
+    Gd(48)=-0.1012;
+    Gd(49)=-0.0952;
+    Gd.scalar_mult(1.0e+03);
 
 
     //Initializing Variables
@@ -149,14 +205,14 @@ PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), Dynamic
     dcmy_d = 0;
     std::cout<<"Online Pattern Planner with Preview Controller Initialized Successfully"<<std::endl;
     firstrun = true;
-    Observer_CoMX = 0.1;
-	Observer_CoMY = 0.2;
+    Observer_CoMX = 0.7;
+	Observer_CoMY = 0.7;
 	Observer_COPX = 0.3;
-	Observer_COPY = 0.6;
-    KalmanX.COP_Noise=0.05;
-    KalmanY.COP_Noise=0.1;
-    KalmanX.CoM_Noise=0.005;
-    KalmanY.CoM_Noise=0.01;
+	Observer_COPY = 0.3;
+    KalmanX.COP_Noise=0.5;
+    KalmanY.COP_Noise=0.5;
+    KalmanX.CoM_Noise=0.001;
+    KalmanY.CoM_Noise=0.001;
 }
 void PCThread::setInitialState( KVecFloat2 CoM, KVecFloat2 ZMP)
 {
