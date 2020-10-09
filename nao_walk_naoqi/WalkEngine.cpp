@@ -1076,12 +1076,12 @@ std::vector<float> WalkEngine::Calculate_IK()
     
     KVecDouble3 armt;
     armt=Tpprimel.getTranslation();
-    armt.scalar_mult(1.0);
+    armt.scalar_mult(0.75);
     //armt.prettyPrint();
     armangles_temp(2)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
     armangles_temp(1)=asin((armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0));
     armt=Tpprimer.getTranslation();
-    armt.scalar_mult(1.0);
+    armt.scalar_mult(0.75);
     //armt.prettyPrint();
     armangles_temp(0)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
     armangles_temp(3)=asin((-armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0) );
@@ -1103,11 +1103,16 @@ std::vector<float> WalkEngine::Calculate_IK()
     armangles(0)=armangles_temp(0);
     armangles(1)=armangles_temp(1);
     armangles(2)=armangles_s(2);
-    armangles(3)=-armangles_temp(1);
+    //armangles(3)=-armangles_temp(1);
+    //armangles(4)=armangles_temp(2);
+    //armangles(6)=armangles_s(6);
+    //armangles(7)=armangles_temp(3);
+    
+    armangles(3)=armangles_s(3);
     armangles(4)=armangles_temp(2);
     armangles(5)=-armangles_temp(3);
     armangles(6)=armangles_s(6);
-    armangles(7)=armangles_temp(3);
+    armangles(7)=armangles_s(7);
     
     if(startup<NaoRobot.getWalkParameter(Init_instructions))
     {
