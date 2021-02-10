@@ -547,7 +547,7 @@ void nao_walk_ros::initialize(ros::NodeHandle nh)
 
 int nao_walk_ros::run()
 {  
-
+    static ros::Rate rate(100);
     while(ros::ok())
     {
         if(socketClient.isConnected())
@@ -562,6 +562,7 @@ int nao_walk_ros::run()
             socketClient.socketConnect(nao_hostname,port);
         }
         ros::spinOnce();
+        rate.sleep();
     }
 
     if(socketClient.isConnected())

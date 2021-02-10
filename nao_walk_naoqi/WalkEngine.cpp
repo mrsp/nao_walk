@@ -946,8 +946,8 @@ std::vector<float> WalkEngine::Calculate_IK()
     /** SET DESIRED COMI and Feet Homogeneous Transformations **/
     /** ------------------------------------------------------------------------ **/
     
-    //desired=KVecDouble3(NaoLIPM.comx_d,NaoLIPM.comy_d,NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
-    desired=KVecDouble3(CoM_c(0),CoM_c(1),NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
+    desired=KVecDouble3(NaoLIPM.comx_d,NaoLIPM.comy_d,NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
+    //desired=KVecDouble3(CoM_c(0),CoM_c(1),NaoRobot.getWalkParameter(ComZ)).scalar_mult(1000);
 
      
     /** Targets for leg feet Transformations **/
@@ -1076,12 +1076,12 @@ std::vector<float> WalkEngine::Calculate_IK()
     
     KVecDouble3 armt;
     armt=Tpprimel.getTranslation();
-    armt.scalar_mult(0.75);
+    armt.scalar_mult(0.4);
     //armt.prettyPrint();
     armangles_temp(2)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
     armangles_temp(1)=asin((armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0));
     armt=Tpprimer.getTranslation();
-    armt.scalar_mult(0.75);
+    armt.scalar_mult(0.4);
     //armt.prettyPrint();
     armangles_temp(0)=asin((-armt(0)+NaoRobot.getWalkParameter(HX)*1000)/(UpperArmLength*1.0) )+M_PI_2;
     armangles_temp(3)=asin((-armt(1)+85-ShoulderOffsetY)/(UpperArmLength*1.0) );
@@ -1100,8 +1100,8 @@ std::vector<float> WalkEngine::Calculate_IK()
         armangles_s(7)=alljoints[KDeviceLists::R_ARM + KDeviceLists::ELBOW_ROLL];
     }
 
-    armangles(0)=armangles_temp(0);
-    armangles(1)=armangles_temp(1);
+    armangles(0)=armangles_temp(0) + 0.349066;
+    armangles(1)=armangles_temp(1) + 0.122173;
     armangles(2)=armangles_s(2);
     //armangles(3)=-armangles_temp(1);
     //armangles(4)=armangles_temp(2);
@@ -1109,8 +1109,8 @@ std::vector<float> WalkEngine::Calculate_IK()
     //armangles(7)=armangles_temp(3);
     
     armangles(3)=armangles_s(3);
-    armangles(4)=armangles_temp(2);
-    armangles(5)=-armangles_temp(3);
+    armangles(4)=armangles_temp(2) + 0.349066;
+    armangles(5)=-armangles_temp(3) - 0.122173;
     armangles(6)=armangles_s(6);
     armangles(7)=armangles_s(7);
     

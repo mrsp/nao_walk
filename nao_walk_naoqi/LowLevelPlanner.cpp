@@ -284,6 +284,7 @@ void LowLevelPlanner::init()
     tts = new AL::ALTextToSpeechProxy(getParentBroker());
     motion = new AL::ALMotionProxy(getParentBroker());
     posture = new AL::ALRobotPostureProxy(getParentBroker());
+    //system("aplay /home/nao/hypno.wav");
     /*
     odom.arraySetSize(8);
     data_.arraySetSize(40);

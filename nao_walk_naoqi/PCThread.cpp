@@ -205,14 +205,14 @@ PCThread::PCThread(RobotParameters &rp ) :  OurRobot(rp), DynamicsX(rp), Dynamic
     dcmy_d = 0;
     std::cout<<"Online Pattern Planner with Preview Controller Initialized Successfully"<<std::endl;
     firstrun = true;
-    Observer_CoMX = 1.24;
-	Observer_CoMY = 1.24;
-	Observer_COPX = 0.4;
-	Observer_COPY = 0.4;
-    KalmanX.COP_Noise=0.5;
-    KalmanY.COP_Noise=0.5;
-    KalmanX.CoM_Noise=0.001;
-    KalmanY.CoM_Noise=0.001;
+    Observer_CoMX = 0.75;
+	Observer_CoMY = 0.75;
+	Observer_COPX = 0.2;
+	Observer_COPY = 0.2;
+    KalmanX.COP_Noise=0.2;
+    KalmanY.COP_Noise=0.2;
+    KalmanX.CoM_Noise=0.01;
+    KalmanY.CoM_Noise=0.01;
 }
 void PCThread::setInitialState( KVecFloat2 CoM, KVecFloat2 ZMP)
 {
