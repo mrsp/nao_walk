@@ -2,7 +2,7 @@
 #define __PCTHREAD_H__
 
 
-#define PWindow 51
+#define PWindow 101
 
 
 #include "KMat.hpp"
