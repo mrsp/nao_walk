@@ -199,10 +199,10 @@ PCThread::PCThread(RobotParameters &rp) : OurRobot(rp), DynamicsX(rp), DynamicsY
     dcmy_d = 0;
     std::cout << "Online Pattern Planner with Preview Controller Initialized Successfully" << std::endl;
     firstrun = true;
-    Observer_CoMX = 0.75;
-    Observer_CoMY = 0.75;
-    Observer_COPX = 0.2;
-    Observer_COPY = 0.2;
+    Observer_CoMX = 0.65;
+    Observer_CoMY = 0.65;
+    Observer_COPX = 0.15;
+    Observer_COPY = 0.15;
     KalmanX.COP_Noise = 0.2;
     KalmanY.COP_Noise = 0.2;
     KalmanX.CoM_Noise = 0.01;

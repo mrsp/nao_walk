@@ -44,15 +44,15 @@ public:
         WalkParameters[Td] = 0.05;
         WalkParameters[StepX] = 0.165;
         WalkParameters[StepY] = 0.085;
-        WalkParameters[StepZ] = 0.015;
+        WalkParameters[StepZ] = 0.016;
         WalkParameters[H0] = 0.1025/2.00;
         WalkParameters[HY] = 0.0;   
         WalkParameters[HX] = -0.015; 
         WalkParameters[ComZ] = 0.26;
-        WalkParameters[Tstep] = 0.45; //0.28
+        WalkParameters[Tstep] = 0.4; //0.28
         WalkParameters[Tinit]= 0.4;
         WalkParameters[Tss] = 0.3; //0.3
-        WalkParameters[Tds] = 0.15; //0.05
+        WalkParameters[Tds] = 0.1; //0.05
         WalkParameters[MaxStepX] = 0.05;
         WalkParameters[MaxStepY] = 2.0*WalkParameters[H0] + 0.01;
         WalkParameters[MaxStepTheta] = 0.349065850401537;
@@ -104,7 +104,7 @@ public:
         WalkParameters[Tss_min] = 0.28;
         WalkParameters[Tss_max] = 0.35;
         WalkParameters[StepPlanAdjustment] = false;
-        WalkParameters[velocityControl] = true;
+        WalkParameters[velocityControl] = false;
         WalkParameters[alpha_ZMPFilter] = 0.35;
     }
     

@@ -8,8 +8,8 @@
 	<rosparam file="$(find nao_walk)/config/robotcfg.yaml" command="load"/> 
 <!--         <param name="odom_topic" type="str" value="/SERoW/odom" />  -->
     </node>	
-    <node pkg = "nao_walk" type = "nao_walk_dynamic_configure" name="nao_walk_dynamic_configure" output = "screen">
-    </node>
+    <!-- <node pkg = "nao_walk" type = "nao_walk_dynamic_configure" name="nao_walk_dynamic_configure" output = "screen">
+    </node> -->
     <node pkg = "nao_behaviour" type = "nao_behaviour_node" name="nao_behaviours" output = "screen">
     </node>
     
